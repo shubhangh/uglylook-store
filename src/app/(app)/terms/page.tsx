@@ -1,0 +1,67 @@
+import type { Metadata } from 'next'
+import { getCachedGlobal } from '@/utilities/getGlobals'
+import type { TermsPage } from '@/payload-types'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service — UglyLook',
+  description: 'Terms and conditions for using UglyLook.',
+}
+
+export default async function TermsPage() {
+  const data = await getCachedGlobal('termsPage', 1)() as TermsPage
+
+  const visibleSections = (data.sections ?? []).filter((s) => s.visible ?? true)
+
+  return (
+    <section className="min-h-screen bg-background py-16 md:py-24">
+      <div className="container max-w-3xl">
+        {/* Section Header */}
+        <header className="mb-16 md:mb-24">
+          <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+            {data.sectionLabel || 'LEGAL / 02'}
+          </span>
+          <h1
+            className="mt-4 font-sans text-4xl font-bold leading-[0.95] text-foreground md:text-6xl lg:text-7xl"
+            style={{ letterSpacing: '-0.03em' }}
+          >
+            {data.heading || 'Terms.'}
+          </h1>
+          <p className="mt-6 font-mono text-[11px] text-muted-foreground uppercase tracking-widest">
+            {data.lastUpdated || 'Last updated: January 2026'}
+          </p>
+        </header>
+
+        <div className="space-y-12">
+          {visibleSections.map((section) => (
+            <div key={section.id || section.number}>
+              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+                <span className="w-[18px] h-px bg-olive inline-block" />
+                {section.number}. {section.title}
+              </h2>
+              <div className="space-y-4 text-base leading-[1.7] text-foreground/70">
+                {section.content.split('\n').map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {(data.showFooterCta ?? true) && (
+            <div className="border-t border-border pt-8 mt-16">
+              <p className="font-mono text-[11px] text-muted-foreground leading-relaxed">
+                {data.footerCtaText || 'Questions about these terms? Email'}{' '}
+                <a
+                  href="mailto:hello@uglylook.com"
+                  className="text-olive-text underline underline-offset-4 hover:text-foreground transition-colors"
+                >
+                  hello@uglylook.com
+                </a>
+                . We&rsquo;ll respond in plain language.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}

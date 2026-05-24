@@ -1,0 +1,31 @@
+.section {
+  padding: 64px 0; border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); background: var(--card);
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter, 32px); }
+.inner { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+.label {
+  font-family: var(--font-jetbrains-mono), monospace; font-size: 11px;
+  color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 10px; max-width: 720px; line-height: 1.5;
+}
+.heading {
+  font-family: var(--font-inter), system-ui, sans-serif; font-weight: 700;
+  font-size: clamp(28px, 3.6vw, 48px); letter-spacing: -0.03em; line-height: 1;
+}
+.clock { display: flex; flex-direction: row; gap: 8px; }
+.cell {
+  background: var(--background); border: 1px solid var(--input);
+  border-radius: 4px; padding: 14px 18px; text-align: center;
+  min-width: 78px; display: flex; flex-direction: column; align-items: center;
+}
+.cellNumber {
+  font-family: var(--font-jetbrains-mono), monospace; font-size: 28px;
+  line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.cellLabel {
+  font-family: var(--font-jetbrains-mono), monospace; font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-foreground); margin-top: 6px;
+}
+@media (max-width: 900px) { .inner { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .wrap { padding: 0 16px; } }

@@ -1,0 +1,128 @@
+/* ---- Site Header ---- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  transition: background 150ms linear, color 150ms linear;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  height: 72px;
+}
+
+/* ---- Left group ---- */
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ---- Lockup ---- */
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+}
+
+.wordmark {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+/* ---- Desktop Nav ---- */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+.navLink {
+  position: relative;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: none;
+  padding-bottom: 4px;
+  transition: color 120ms linear;
+}
+
+.navLink:hover {
+  color: var(--foreground);
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 220ms ease;
+}
+
+.navLink:hover::after {
+  transform: scaleX(1);
+}
+
+.active::after {
+  transform: scaleX(1);
+}
+
+/* ---- Right Actions ---- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* ---- Mobile ---- */
+
+.mobileOnly {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .mobileOnly {
+    display: block;
+  }
+
+  .inner {
+    height: 60px;
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .wordmark {
+    height: 24px;
+  }
+}

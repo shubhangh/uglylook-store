@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200">
+  <rect width="960" height="1200" fill="#111111"/>
+  <!-- Cap crown (profile view) -->
+  <path d="
+    M320 580
+    C320 480, 370 400, 440 370
+    C480 355, 530 355, 570 370
+    C620 390, 650 440, 650 520
+    C650 550, 645 570, 640 580
+    Z
+  " fill="#5A6242"/>
+  <!-- Cap brim -->
+  <path d="
+    M310 580
+    C310 575, 280 580, 240 600
+    C210 615, 200 630, 220 640
+    C240 650, 300 640, 350 620
+    C400 600, 650 585, 660 580
+    L310 580
+    Z
+  " fill="#4A5235"/>
+  <!-- Band line -->
+  <line x1="320" y1="580" x2="650" y2="580" stroke="#4A5235" stroke-width="2"/>
+  <!-- Button on top -->
+  <circle cx="490" cy="372" r="8" fill="#4A5235"/>
+  <!-- UL monogram -->
+  <text x="485" y="510" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="60" font-weight="900" letter-spacing="4" fill="#F5F2EC">UL</text>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200">
+  <rect width="960" height="1200" fill="#111111"/>
+  <!-- Tote bag body -->
+  <path d="
+    M310 420
+    L290 900
+    C290 915, 300 925, 315 925
+    L645 925
+    C660 925, 670 915, 670 900
+    L650 420
+    Z
+  " fill="#D9D2C2"/>
+  <!-- Left handle -->
+  <path d="M380 420 C380 340, 390 300, 420 300 C450 300, 450 340, 450 420" fill="none" stroke="#D9D2C2" stroke-width="18" stroke-linecap="round"/>
+  <!-- Right handle -->
+  <path d="M510 420 C510 340, 520 300, 540 300 C560 300, 570 340, 570 420" fill="none" stroke="#D9D2C2" stroke-width="18" stroke-linecap="round"/>
+  <!-- Top edge -->
+  <line x1="310" y1="420" x2="650" y2="420" stroke="#C4BDB0" stroke-width="4"/>
+  <!-- Text -->
+  <text x="470" y="650" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="64" font-weight="900" letter-spacing="8" fill="#111111">COPE</text>
+  <text x="470" y="700" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" letter-spacing="5" fill="#111111">WITH GROCERIES</text>
+</svg>

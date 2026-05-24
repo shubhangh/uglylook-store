@@ -1,0 +1,157 @@
+/* ---- Pre-footer Newsletter CTA ---- */
+
+.section {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 80px;
+  padding-bottom: 80px;
+  position: relative;
+  min-height: 360px;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 480px;
+}
+
+.label {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--olive-text);
+}
+
+.heading {
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--foreground);
+  margin-top: 16px;
+}
+
+.subtext {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 400px;
+  margin-top: 28px;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--foreground);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.button {
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 120ms linear, color 120ms linear;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.confirmation {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 13px;
+  color: var(--olive-text);
+  margin-top: 28px;
+}
+
+/* ---- Floating silhouettes ---- */
+
+.decorative {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  pointer-events: none;
+}
+
+.silhouette {
+  opacity: 0.06;
+  color: var(--foreground);
+  animation: float 8s ease-in-out infinite;
+}
+
+.silhouette2 {
+  opacity: 0.04;
+  color: var(--foreground);
+  animation: float 8s ease-in-out infinite 2s;
+}
+
+.tee {
+  width: 140px;
+  height: auto;
+}
+
+.hoodie {
+  width: 120px;
+  height: auto;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .inner {
+    padding-top: 56px;
+    padding-bottom: 56px;
+    min-height: auto;
+  }
+
+  .decorative {
+    display: none;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+}

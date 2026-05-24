@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200">
+  <rect width="960" height="1200" fill="#111111"/>
+  <!-- Cream tee silhouette -->
+  <path d="
+    M380 280
+    C380 260, 400 240, 430 235
+    C440 230, 460 228, 480 228
+    C500 228, 520 230, 530 235
+    C560 240, 580 260, 580 280
+    L640 300
+    L680 320
+    L700 400
+    L660 420
+    L620 380
+    L620 850
+    C620 860, 610 870, 600 870
+    L360 870
+    C350 870, 340 860, 340 850
+    L340 380
+    L300 420
+    L260 400
+    L280 320
+    L320 300
+    Z
+  " fill="#D9D2C2"/>
+  <!-- Neckline -->
+  <ellipse cx="480" cy="265" rx="45" ry="20" fill="#111111"/>
+  <!-- Text -->
+  <text x="480" y="580" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="3" fill="#111111">I PEAKED IN 2009</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200">
+  <rect width="960" height="1200" fill="#111111"/>
+  <!-- Olive hoodie silhouette -->
+  <path d="
+    M430 220
+    C420 200, 425 180, 440 170
+    C455 160, 475 158, 480 158
+    C485 158, 505 160, 520 170
+    C535 180, 540 200, 530 220
+    C530 230, 520 238, 510 242
+    C540 245, 570 255, 580 270
+    L650 300
+    L690 330
+    L710 420
+    L665 445
+    L625 395
+    L625 920
+    C625 930, 615 940, 605 940
+    L355 940
+    C345 940, 335 930, 335 920
+    L335 395
+    L295 445
+    L250 420
+    L270 330
+    L310 300
+    L380 270
+    C390 255, 420 245, 450 242
+    C440 238, 430 230, 430 220
+    Z
+  " fill="#5A6242"/>
+  <!-- Hood opening / neckline -->
+  <path d="M440 225 C445 245, 470 255, 480 255 C490 255, 515 245, 520 225" fill="none" stroke="#4A5235" stroke-width="2"/>
+  <!-- Kangaroo pocket -->
+  <rect x="395" y="680" width="170" height="80" rx="4" fill="none" stroke="#4A5235" stroke-width="1"/>
+  <!-- Text -->
+  <text x="480" y="570" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="5" fill="#F5F2EC">ARE U REAL</text>
+</svg>

@@ -1,0 +1,82 @@
+/* ---- Hamburger ---- */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.hamburgerLine {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--foreground);
+  border-radius: 1px;
+}
+
+/* ---- Mobile Overlay ---- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 32px;
+  color: var(--foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.mobileNavLink {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.mobileNavLink:hover {
+  color: var(--foreground);
+  opacity: 0.8;
+}
+
+.mobileThemeToggle {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  background: none;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.mobileThemeToggle:hover {
+  color: var(--foreground);
+  border-color: var(--primary);
+}

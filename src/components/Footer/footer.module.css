@@ -1,0 +1,199 @@
+/* ---- Site Footer ---- */
+
+.footer {
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  padding: 64px 0 32px;
+  transition: background 150ms linear, color 150ms linear;
+}
+
+/* ---- Top Section ---- */
+
+.top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 64px;
+}
+
+/* ---- Brand Column ---- */
+
+.brandCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+}
+
+.wordmark {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.tagline {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* ---- Email Form ---- */
+
+.emailForm {
+  display: flex;
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 320px;
+}
+
+.emailInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--foreground);
+  outline: none;
+}
+
+.emailInput::placeholder {
+  color: var(--muted-foreground);
+}
+
+.emailBtn {
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 120ms linear, color 120ms linear;
+}
+
+.emailBtn:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.note {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* ---- Link Columns ---- */
+
+.linkCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.colTitle {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.colLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.colLink {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color 120ms linear;
+}
+
+.colLink:hover {
+  color: var(--foreground);
+}
+
+/* ---- Bottom Bar ---- */
+
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+.bottomText {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 120ms linear;
+}
+
+.themeToggle:hover {
+  color: var(--foreground);
+}
+
+.themeDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .top {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bottom {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .top {
+    grid-template-columns: 1fr;
+  }
+}

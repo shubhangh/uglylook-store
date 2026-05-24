@@ -1,0 +1,15 @@
+.mark {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(245, 242, 236, 0.22);
+  pointer-events: none;
+  z-index: 1;
+}
+[data-theme='light'] .mark {
+  border-color: rgba(17, 17, 17, 0.22);
+}
+.tl { top: 16px; left: 16px; border-right: 0; border-bottom: 0; }
+.tr { top: 16px; right: 16px; border-left: 0; border-bottom: 0; }
+.bl { bottom: 16px; left: 16px; border-right: 0; border-top: 0; }
+.br { bottom: 16px; right: 16px; border-left: 0; border-top: 0; }

@@ -1,0 +1,124 @@
+// UglyLook Admin Theme
+// Brand: olive #5A6242, petrol #264A4F, bone #D9D2C2, near-black #111, cream #F5F2EC
+//
+// Olive contrast on #111: ~2.8:1 — FAILS WCAG AA for text.
+// Rule: olive is ONLY for backgrounds (buttons, badges, pills) with cream text on top.
+// All text on dark bg uses cream/neutral tones for readability.
+
+:root {
+  // Dark theme (default)
+  --theme-bg: #111111;
+  --theme-input-bg: #1a1a1a;
+  --theme-elevation-0: #111111;
+  --theme-elevation-50: #161616;
+  --theme-elevation-100: #1c1c1c;
+  --theme-elevation-150: #222222;
+  --theme-elevation-200: #2a2a2a;
+  --theme-elevation-250: #333333;
+  --theme-elevation-300: #3d3d3d;
+  --theme-elevation-350: #4a4a4a;
+  --theme-elevation-400: #555555;
+  --theme-elevation-450: #666666;
+  --theme-elevation-500: #888888;
+  --theme-elevation-550: #999999;
+  --theme-elevation-600: #aaaaaa;
+  --theme-elevation-650: #bbbbbb;
+  --theme-elevation-700: #cccccc;
+  --theme-elevation-750: #dddddd;
+  --theme-elevation-800: #e5e5e5;
+  --theme-elevation-850: #eeeeee;
+  --theme-elevation-900: #f5f2ec;
+  --theme-elevation-950: #f5f2ec;
+  --theme-elevation-1000: #ffffff;
+
+  --theme-text: #f5f2ec;
+  --theme-error-500: #e55;
+  --theme-warning-500: #D9D2C2;
+
+  // Success uses a lightened olive that passes AA contrast on dark bg (~5.5:1)
+  --theme-success-500: #a3b07e;
+  --theme-success-400: #b5c192;
+
+  --theme-baseline-text-saturation-adjustment: 0;
+}
+
+// Nav branding
+.nav-header {
+  border-bottom-color: var(--theme-elevation-200) !important;
+}
+
+// Login page styling — olive bg buttons (cream text on top = good contrast)
+[class*='login'] {
+  .form-submit .btn {
+    background-color: #5A6242 !important;
+    border-color: #5A6242 !important;
+    color: #f5f2ec !important;
+
+    &:hover {
+      background-color: #6b7350 !important;
+      border-color: #6b7350 !important;
+    }
+  }
+}
+
+// Primary buttons → olive bg with cream text (good contrast)
+.btn[class*='primary'],
+button[class*='primary'] {
+  --btn-bg: #5A6242;
+  --btn-border: #5A6242;
+  --btn-color: #f5f2ec;
+
+  &:hover {
+    --btn-bg: #6b7350;
+    --btn-border: #6b7350;
+  }
+}
+
+// Pill / tag active state — olive bg, cream text
+.pill[class*='active'],
+.chip[class*='active'] {
+  background-color: #5A6242 !important;
+  color: #f5f2ec !important;
+}
+
+// Sidebar nav — nudge up from default
+.nav a,
+.nav__link,
+[class*='nav-group'] a {
+  font-size: 13.5px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+[class*='nav-group__toggle'] {
+  font-size: 11px !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

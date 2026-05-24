@@ -1,0 +1,98 @@
+.hero { padding: 64px 0 96px; border-bottom: 1px solid var(--border); position: relative; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter, 32px); }
+
+.strip {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 48px;
+}
+.stamp { display: flex; align-items: center; gap: 8px; }
+.dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--primary); animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.clock { margin-right: 16px; }
+
+.headline {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 10vw, 160px);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  color: var(--foreground);
+}
+.line1, .line2, .line3 { display: block; }
+.line2 { padding-left: clamp(0px, 4vw, 64px); }
+.line3 { text-align: right; margin-top: -0.08em; }
+.strike {
+  text-decoration: line-through; text-decoration-thickness: 4px;
+  text-decoration-color: var(--primary); color: var(--muted-foreground);
+}
+.invert {
+  background: var(--foreground); color: var(--background);
+  padding: 0 0.12em; display: inline-block; line-height: 0.92;
+}
+
+.row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: end; margin-top: 48px; }
+.subtitle { font-size: 19px; line-height: 1.5; max-width: 540px; color: var(--foreground); }
+.subtitle em { font-style: normal; }
+.cottonHighlight { background: var(--primary); color: var(--primary-foreground); font-style: normal; padding: 1px 6px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 32px; align-items: center; }
+.btnPrimary {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary);
+  padding: 14px 22px; border-radius: 4px; font-size: 14px; font-weight: 500;
+  text-decoration: none; transition: background 0.2s, border-color 0.2s;
+}
+.btnPrimary:hover { background: var(--color-olive-deep); border-color: var(--color-olive-deep); }
+.btnSecondary {
+  display: inline-flex; align-items: center;
+  background: transparent; color: var(--foreground); border: 1px solid var(--foreground);
+  padding: 14px 22px; border-radius: 4px; font-size: 14px; font-weight: 500;
+  text-decoration: none; transition: background 0.2s, color 0.2s;
+}
+.btnSecondary:hover { background: var(--foreground); color: var(--background); }
+.note { font-family: var(--font-jetbrains-mono), monospace; font-size: 11px; color: var(--muted-foreground); }
+
+/* Tag card */
+.tagCard {
+  position: relative; border: 1px solid var(--foreground); background: var(--background);
+  font-family: var(--font-jetbrains-mono), monospace; font-size: 11px; padding: 24px; margin: 0;
+}
+.tagCard::before {
+  content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px;
+  border-right: 1px solid var(--primary); border-bottom: 1px solid var(--primary); pointer-events: none;
+}
+.tagCard::after {
+  content: ""; position: absolute; bottom: -1px; right: -1px; width: 28px; height: 28px;
+  border-left: 1px solid var(--primary); border-top: 1px solid var(--primary); pointer-events: none;
+}
+.tagRow {
+  display: grid; grid-template-columns: 90px 1fr; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.tagRow:last-child { border-bottom: none; }
+.tagLabel { text-transform: uppercase; color: var(--muted-foreground); margin: 0; }
+.tagValue { color: var(--foreground); font-size: 13px; margin: 0; }
+.tagHighlight { color: var(--olive-text); }
+
+@media (max-width: 900px) {
+  .headline { font-size: clamp(40px, 11vw, 80px); }
+  .line2 { padding-left: 0; }
+  .line3 { text-align: left; margin-top: 0; }
+  .row { grid-template-columns: 1fr; gap: 32px; }
+  .strip { font-size: 9px; }
+}
+@media (max-width: 600px) {
+  .hero { padding: 32px 0 48px; }
+  .wrap { padding: 0 16px; }
+}
