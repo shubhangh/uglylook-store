@@ -68,18 +68,41 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    customers: CustomerAuthOperations;
+    team: TeamAuthOperations;
     'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
-    users: User;
+    customers: Customer;
     pages: Page;
     posts: Post;
     categories: Category;
     media: Media;
-    forms: Form;
-    'form-submissions': FormSubmission;
+    team: Team;
+    'global-keys': GlobalKey;
+    'my-keys': MyKey;
+    subscribers: Subscriber;
+    redirects: Redirect;
+    coupons: Coupon;
+    offers: Offer;
+    buckets: Bucket;
+    'ai-graphics': AiGraphic;
+    designs: Design;
+    'printify-catalog': PrintifyCatalog;
+    'printify-launcher': PrintifyLauncher;
+    'printify-design-studio': PrintifyDesignStudio;
+    'printify-analysis': PrintifyAnalysis;
+    'printify-fulfillment': PrintifyFulfillment;
+    'design-presets': DesignPreset;
+    'ai-model-registry': AiModelRegistry;
+    'printify-catalog-cache': PrintifyCatalogCache;
+    'printify-sync-log': PrintifySyncLog;
+    'r2-browser': R2Browser;
+    'bulk-uploads': BulkUpload;
+    'bulk-reads': BulkRead;
+    'bulk-feedback': BulkFeedback;
+    'ai-product-analysis-cache': AiProductAnalysisCache;
     addresses: Address;
     variants: Variant;
     variantTypes: VariantType;
@@ -88,6 +111,8 @@ export interface Config {
     carts: Cart;
     orders: Order;
     transactions: Transaction;
+    forms: Form;
+    'form-submissions': FormSubmission;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -95,7 +120,7 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
-    users: {
+    customers: {
       orders: 'orders';
       cart: 'carts';
       addresses: 'addresses';
@@ -108,13 +133,35 @@ export interface Config {
     };
   };
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    forms: FormsSelect<false> | FormsSelect<true>;
-    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    'global-keys': GlobalKeysSelect<false> | GlobalKeysSelect<true>;
+    'my-keys': MyKeysSelect<false> | MyKeysSelect<true>;
+    subscribers: SubscribersSelect<false> | SubscribersSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    coupons: CouponsSelect<false> | CouponsSelect<true>;
+    offers: OffersSelect<false> | OffersSelect<true>;
+    buckets: BucketsSelect<false> | BucketsSelect<true>;
+    'ai-graphics': AiGraphicsSelect<false> | AiGraphicsSelect<true>;
+    designs: DesignsSelect<false> | DesignsSelect<true>;
+    'printify-catalog': PrintifyCatalogSelect<false> | PrintifyCatalogSelect<true>;
+    'printify-launcher': PrintifyLauncherSelect<false> | PrintifyLauncherSelect<true>;
+    'printify-design-studio': PrintifyDesignStudioSelect<false> | PrintifyDesignStudioSelect<true>;
+    'printify-analysis': PrintifyAnalysisSelect<false> | PrintifyAnalysisSelect<true>;
+    'printify-fulfillment': PrintifyFulfillmentSelect<false> | PrintifyFulfillmentSelect<true>;
+    'design-presets': DesignPresetsSelect<false> | DesignPresetsSelect<true>;
+    'ai-model-registry': AiModelRegistrySelect<false> | AiModelRegistrySelect<true>;
+    'printify-catalog-cache': PrintifyCatalogCacheSelect<false> | PrintifyCatalogCacheSelect<true>;
+    'printify-sync-log': PrintifySyncLogSelect<false> | PrintifySyncLogSelect<true>;
+    'r2-browser': R2BrowserSelect<false> | R2BrowserSelect<true>;
+    'bulk-uploads': BulkUploadsSelect<false> | BulkUploadsSelect<true>;
+    'bulk-reads': BulkReadsSelect<false> | BulkReadsSelect<true>;
+    'bulk-feedback': BulkFeedbackSelect<false> | BulkFeedbackSelect<true>;
+    'ai-product-analysis-cache': AiProductAnalysisCacheSelect<false> | AiProductAnalysisCacheSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
     variants: VariantsSelect<false> | VariantsSelect<true>;
     variantTypes: VariantTypesSelect<false> | VariantTypesSelect<true>;
@@ -123,6 +170,8 @@ export interface Config {
     carts: CartsSelect<false> | CartsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
+    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -134,6 +183,7 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    announcementBar: AnnouncementBar;
     header: Header;
     footer: Footer;
     homepage: Homepage;
@@ -146,8 +196,11 @@ export interface Config {
     sizeGuidePage: SizeGuidePage;
     privacyPage: PrivacyPage;
     termsPage: TermsPage;
+    'printify-defaults': PrintifyDefault;
+    'ai-settings': AiSetting;
   };
   globalsSelect: {
+    announcementBar: AnnouncementBarSelect<false> | AnnouncementBarSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
@@ -160,12 +213,14 @@ export interface Config {
     sizeGuidePage: SizeGuidePageSelect<false> | SizeGuidePageSelect<true>;
     privacyPage: PrivacyPageSelect<false> | PrivacyPageSelect<true>;
     termsPage: TermsPageSelect<false> | TermsPageSelect<true>;
+    'printify-defaults': PrintifyDefaultsSelect<false> | PrintifyDefaultsSelect<true>;
+    'ai-settings': AiSettingsSelect<false> | AiSettingsSelect<true>;
   };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User | PayloadMcpApiKey;
+  user: Customer | Team | PayloadMcpApiKey;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -177,7 +232,7 @@ export interface Config {
     collections: {
       addresses: Address;
       carts: Cart;
-      customers?: User;
+      customers: Customer;
       orders: Order;
       products: Product;
       transactions: Transaction;
@@ -187,7 +242,25 @@ export interface Config {
     };
   };
 }
-export interface UserAuthOperations {
+export interface CustomerAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface TeamAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -225,16 +298,23 @@ export interface PayloadMcpApiKeyAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "customers".
  */
-export interface User {
+export interface Customer {
   id: string;
   name?: string | null;
   /**
    * Profile picture
    */
   avatar?: (string | null) | Media;
-  roles?: ('admin' | 'customer')[] | null;
+  /**
+   * Contact phone number
+   */
+  phone?: string | null;
+  /**
+   * Opted in to marketing emails
+   */
+  marketingOptIn?: boolean | null;
   orders?: {
     docs?: (string | Order)[];
     hasNextPage?: boolean;
@@ -267,7 +347,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-  collection: 'users';
+  collection: 'customers';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -291,6 +371,14 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Whether this media has an image hash
+   */
+  hasHash?: boolean | null;
+  /**
+   * SHA-256 hash of the file content (auto-computed on upload)
+   */
+  imageHash?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -309,6 +397,10 @@ export interface Media {
  */
 export interface Order {
   id: string;
+  /**
+   * Uncheck to unlock core fields for editing (owner/admin only). Re-check after editing to re-lock.
+   */
+  isLocked?: boolean | null;
   items?:
     | {
         product?: (string | null) | Product;
@@ -330,13 +422,82 @@ export interface Order {
     country?: string | null;
     phone?: string | null;
   };
-  customer?: (string | null) | User;
+  customer?: (string | null) | Customer;
   customerEmail?: string | null;
   transactions?: (string | Transaction)[] | null;
   status?: OrderStatus;
   amount?: number | null;
   currency?: 'USD' | null;
+  /**
+   * How this record was created
+   */
+  source?: ('storefront' | 'manual' | 'api') | null;
+  /**
+   * Internal notes — append only. Existing notes cannot be edited or deleted.
+   */
+  notes?:
+    | {
+        text: string;
+        addedBy?: string | null;
+        addedAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   accessToken?: string | null;
+  /**
+   * Printify order ID (auto-populated)
+   */
+  printifyOrderId?: string | null;
+  /**
+   * Printify fulfillment status
+   */
+  fulfillmentStatus?:
+    | (
+        | 'pending'
+        | 'sent_to_printify'
+        | 'in_production'
+        | 'shipped'
+        | 'delivered'
+        | 'cancelled'
+        | 'on_hold'
+        | 'failed'
+        | 'manual'
+      )
+    | null;
+  /**
+   * Shipping tracking number
+   */
+  trackingNumber?: string | null;
+  /**
+   * Shipping carrier (USPS, UPS, FedEx, etc.)
+   */
+  trackingCarrier?: string | null;
+  /**
+   * Tracking URL
+   */
+  trackingUrl?: string | null;
+  /**
+   * Last fulfillment update note
+   */
+  fulfillmentNote?: string | null;
+  /**
+   * Auto-logged fulfillment timeline. Cannot be edited.
+   */
+  fulfillmentHistory?:
+    | {
+        status?: string | null;
+        message?: string | null;
+        /**
+         * webhook, push, retry, sync, manual
+         */
+        source?: string | null;
+        trackingNumber?: string | null;
+        trackingCarrier?: string | null;
+        trackingUrl?: string | null;
+        timestamp?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -391,10 +552,44 @@ export interface Product {
   };
   categories?: (string | Category)[] | null;
   /**
+   * Admin-only grouping. Not visible to customers.
+   */
+  buckets?: (string | Bucket)[] | null;
+  /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Submit for review to get admin approval before publishing.
+   */
+  approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
+  reviewedBy?: (string | null) | Team;
+  /**
+   * Feedback from the reviewer.
+   */
+  reviewNotes?: string | null;
+  submittedForReviewAt?: string | null;
+  /**
+   * Linked design from the Design Library. Auto-populates printFile and designUrl.
+   */
+  design?: (string | null) | Design;
+  /**
+   * Print-ready design file (PNG, transparent bg). Sent to Printify for printing.
+   */
+  printFile?: (string | null) | Media;
+  /**
+   * Printify fulfillment config: blueprintId, providerId, designUrl, placement, variantMap. Auto-populated by Product Launcher or set manually.
+   */
+  printifyConfig?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -651,6 +846,10 @@ export interface Category {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * When off, this category is hidden from the shop, navigation, and sitemap. Use for internal categories like logos or design assets.
+   */
+  showOnStorefront?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -936,6 +1135,10 @@ export interface Variant {
   inventory?: number | null;
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
+  /**
+   * Printify variant ID (overrides product-level default)
+   */
+  printifyVariantId?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -943,10 +1146,370 @@ export interface Variant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buckets".
+ */
+export interface Bucket {
+  id: string;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Internal note about this bucket (not shown to customers).
+   */
+  description?: string | null;
+  status?: ('active' | 'archived') | null;
+  /**
+   * Visual tag color in admin list.
+   */
+  color?: ('olive' | 'petrol' | 'bone' | 'charcoal') | null;
+  /**
+   * Products in this bucket.
+   */
+  products?: (string | Product)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: string;
+  name: string;
+  /**
+   * Profile picture
+   */
+  avatar?: (string | null) | Media;
+  /**
+   * Owner: full control. Admin: full CRUD. Manager: products + orders. Editor: content only.
+   */
+  role: 'owner' | 'admin' | 'manager' | 'editor';
+  /**
+   * Optional — your personal keys override global keys for your AI generation usage.
+   */
+  aiKeys?: {
+    anthropicKeyLabel?: string | null;
+    /**
+     * Overrides global Anthropic key for your usage
+     */
+    anthropicKey?: string | null;
+    bflKeyLabel?: string | null;
+    /**
+     * Overrides global BFL key for your usage
+     */
+    bflKey?: string | null;
+    geminiKeyLabel?: string | null;
+    /**
+     * Overrides global Gemini key for your usage
+     */
+    geminiKey?: string | null;
+    openaiKeyLabel?: string | null;
+    /**
+     * Overrides global OpenAI key for your usage
+     */
+    openaiKey?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'team';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designs".
+ */
+export interface Design {
+  id: string;
+  title: string;
+  /**
+   * Internal slug: title-model-name (e.g., "melt-protocol-flux-2-0-pro"). Auto-generated.
+   */
+  ulTitle?: string | null;
+  /**
+   * Print-ready design PNG (transparent bg, 300+ DPI)
+   */
+  designFile: string | Media;
+  /**
+   * Auto-populated R2 URL after upload
+   */
+  designUrl?: string | null;
+  /**
+   * Optional smaller preview
+   */
+  thumbnail?: (string | null) | Media;
+  type: 'logo' | 'text-composition' | 'graphic' | 'pattern' | 'typography' | 'illustration';
+  designLane?: ('ironic-text' | 'brutalist' | 'weirdcore' | 'maximalist' | 'y2k' | 'logo-brand') | null;
+  emotionTier?: ('A' | 'B' | 'C') | null;
+  /**
+   * e.g., "self-deprecation as armor"
+   */
+  emotionPrimary?: string | null;
+  forCategories?: ('hoodies' | 'tees' | 'hats' | 'totes' | 'sweatshirts' | 'all')[] | null;
+  forGarmentColors?: ('dark' | 'light' | 'both')[] | null;
+  /**
+   * e.g., "ERROR 404", "EMOTIONALLY UNAVAILABLE"
+   */
+  printText?: string | null;
+  /**
+   * e.g., "JetBrains Mono Bold, distressed"
+   */
+  fontInfo?: string | null;
+  generatedBy?:
+    | ('flux-2-pro' | 'gemini-2.5-flash' | 'gemini-3-pro-image' | 'gpt-image-1' | 'gpt-image-2' | 'manual' | 'existing')
+    | null;
+  /**
+   * The full prompt used to generate this design
+   */
+  generationPrompt?: string | null;
+  /**
+   * Cost in USD to generate
+   */
+  generationCost?: number | null;
+  /**
+   * Claude model used for prompt generation
+   */
+  promptModel?: string | null;
+  /**
+   * Image model ID used for generation (e.g., flux-2-pro)
+   */
+  imageModel?: string | null;
+  /**
+   * Display name of image model (e.g., FLUX 2.0 Pro)
+   */
+  imageModelDisplayName?: string | null;
+  /**
+   * When this design was generated
+   */
+  generatedAt?: string | null;
+  /**
+   * Time taken to generate (seconds)
+   */
+  generationTimeSeconds?: number | null;
+  /**
+   * Team member who generated this design
+   */
+  generatedByUser?: (string | null) | Team;
+  /**
+   * Preset used to generate this design (null if from scratch)
+   */
+  preset?: (string | null) | DesignPreset;
+  /**
+   * Products referencing this design
+   */
+  usageCount?: number | null;
+  /**
+   * Pinned designs appear first in pickers
+   */
+  isPinned?: boolean | null;
+  /**
+   * Searchable tags: ["logo", "light", "horizontal"]
+   */
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status?: ('active' | 'draft' | 'archived') | null;
+  /**
+   * Width in pixels
+   */
+  printWidth?: number | null;
+  /**
+   * Height in pixels
+   */
+  printHeight?: number | null;
+  dpi?: number | null;
+  /**
+   * AI graphic used as background (if text-composition workflow)
+   */
+  sourceGraphic?: (string | null) | AiGraphic;
+  /**
+   * If true, design file is also browsable in the general Media collection
+   */
+  alsoInMedia?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design-presets".
+ */
+export interface DesignPreset {
+  id: string;
+  name: string;
+  description?: string | null;
+  /**
+   * Claude model for prompt generation
+   */
+  promptModel?: (string | null) | AiModelRegistry;
+  detailLevel?: ('low' | 'medium' | 'high' | 'very-high') | null;
+  /**
+   * Skip Claude — use template prompt directly
+   */
+  skipAiPrompt?: boolean | null;
+  /**
+   * Pre-written prompt template. Used if skipAiPrompt is true, or as extra context for Claude.
+   */
+  templatePrompt?: string | null;
+  /**
+   * Image generation model
+   */
+  imageModel?: (string | null) | AiModelRegistry;
+  defaultCount?: number | null;
+  generationMode?:
+    | ('free-brief' | 'fashion-doc' | 'upload-doc' | 'combined' | 'reference-images' | 'sku-based' | 'remix')
+    | null;
+  category?: ('hoodies' | 'tees' | 'hats' | 'totes' | 'sweatshirts' | 'all') | null;
+  garmentColor?: ('dark' | 'light' | 'both') | null;
+  designType?: ('logo' | 'text-composition' | 'graphic' | 'pattern' | 'typography') | null;
+  designLane?: ('ironic-text' | 'brutalist' | 'weirdcore' | 'maximalist' | 'y2k' | 'logo-brand') | null;
+  emotionTier?: ('A' | 'B' | 'C') | null;
+  timesUsed?: number | null;
+  lastUsedAt?: string | null;
+  designsGenerated?: number | null;
+  createdByUser?: (string | null) | Team;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-model-registry".
+ */
+export interface AiModelRegistry {
+  id: string;
+  /**
+   * API model ID. e.g., "claude-opus-4-6", "flux-2-pro"
+   */
+  modelId: string;
+  /**
+   * Shown in UI. e.g., "Claude Opus 4.6", "FLUX 2.0 Pro"
+   */
+  displayName: string;
+  /**
+   * Grouping. e.g., "Claude Opus", "FLUX", "Gemini"
+   */
+  family: string;
+  /**
+   * e.g., "4.6", "2.0 Pro", "2.5 Flash"
+   */
+  version?: string | null;
+  provider: 'anthropic' | 'bfl' | 'gemini' | 'openai';
+  modelType: 'prompt' | 'image' | 'image-edit';
+  tag?: ('default' | 'fast' | 'better' | 'best' | 'draft' | 'creative') | null;
+  /**
+   * Image models: USD per image. e.g., 0.075
+   */
+  costPerImage?: number | null;
+  /**
+   * Prompt models: USD per 1K input tokens
+   */
+  costPer1kInputTokens?: number | null;
+  /**
+   * Prompt models: USD per 1K output tokens
+   */
+  costPer1kOutputTokens?: number | null;
+  /**
+   * Disabled models hidden from Design Studio selector
+   */
+  isEnabled?: boolean | null;
+  /**
+   * Default model for its type (one per type)
+   */
+  isDefault?: boolean | null;
+  source?: ('manual' | 'auto') | null;
+  lastVerifiedAt?: string | null;
+  /**
+   * Flagged deprecated by provider during auto-sync
+   */
+  isDeprecated?: boolean | null;
+  /**
+   * One-line description shown in Design Studio selector. e.g., "Best quality, sharp details"
+   */
+  shortDescription?: string | null;
+  /**
+   * Admin notes about this model (not shown to users)
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-graphics".
+ */
+export interface AiGraphic {
+  id: string;
+  title: string;
+  /**
+   * Raw AI-generated graphic (no text, transparent bg)
+   */
+  imageFile: string | Media;
+  /**
+   * Auto-populated R2 URL after upload
+   */
+  imageUrl?: string | null;
+  palette?: ('muted-chaos' | 'digital-rot' | 'concrete-heat' | 'faded-flash') | null;
+  style?: ('wireframe-cluster' | 'corrupted-scan' | 'brutalist-grid') | null;
+  orientation?: ('vertical' | 'horizontal' | 'square') | null;
+  /**
+   * Full prompt used (text-free)
+   */
+  generationPrompt?: string | null;
+  /**
+   * e.g., flux-2-pro
+   */
+  imageModel?: string | null;
+  /**
+   * Cost in USD
+   */
+  generationCost?: number | null;
+  /**
+   * Width in pixels
+   */
+  width?: number | null;
+  /**
+   * Height in pixels
+   */
+  height?: number | null;
+  /**
+   * Designs using this graphic
+   */
+  usageCount?: number | null;
+  status?: ('active' | 'draft' | 'archived') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions".
  */
 export interface Transaction {
   id: string;
+  /**
+   * Uncheck to unlock core fields for editing (owner/admin only). Re-check after editing to re-lock.
+   */
+  isLocked?: boolean | null;
   items?:
     | {
         product?: (string | null) | Product;
@@ -974,12 +1537,27 @@ export interface Transaction {
     phone?: string | null;
   };
   status: 'pending' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
-  customer?: (string | null) | User;
+  customer?: (string | null) | Customer;
   customerEmail?: string | null;
   order?: (string | null) | Order;
   cart?: (string | null) | Cart;
   amount?: number | null;
   currency?: 'USD' | null;
+  /**
+   * How this record was created
+   */
+  source?: ('storefront' | 'manual' | 'api') | null;
+  /**
+   * Internal notes — append only. Existing notes cannot be edited or deleted.
+   */
+  notes?:
+    | {
+        text: string;
+        addedBy?: string | null;
+        addedAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -998,7 +1576,7 @@ export interface Cart {
       }[]
     | null;
   secret?: string | null;
-  customer?: (string | null) | User;
+  customer?: (string | null) | Customer;
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
@@ -1012,7 +1590,7 @@ export interface Cart {
  */
 export interface Address {
   id: string;
-  customer?: (string | null) | User;
+  customer?: (string | null) | Customer;
   title?: string | null;
   firstName?: string | null;
   lastName?: string | null;
@@ -1096,6 +1674,507 @@ export interface Post {
   author?: string | null;
   status?: ('draft' | 'published') | null;
   publishedAt?: string | null;
+  /**
+   * Submit for review to get admin approval before publishing.
+   */
+  approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
+  reviewedBy?: (string | null) | Team;
+  /**
+   * Feedback from the reviewer.
+   */
+  reviewNotes?: string | null;
+  submittedForReviewAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "global-keys".
+ */
+export interface GlobalKey {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "my-keys".
+ */
+export interface MyKey {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers".
+ */
+export interface Subscriber {
+  id: string;
+  email: string;
+  source?: ('footer' | 'newsletter-cta' | 'checkout' | 'manual') | null;
+  subscribedAt?: string | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: string;
+  /**
+   * Source path (e.g., /old-page). No trailing slash.
+   */
+  from: string;
+  /**
+   * Destination path or full URL (e.g., /new-page or https://...).
+   */
+  to: string;
+  type: '301' | '302';
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coupons".
+ */
+export interface Coupon {
+  id: string;
+  /**
+   * Internal name (e.g., "Summer 20% Off Code")
+   */
+  title: string;
+  /**
+   * Customer-facing code (e.g., "UGLY20"). Auto-uppercased.
+   */
+  code: string;
+  /**
+   * Internal notes about this coupon.
+   */
+  description?: string | null;
+  type: 'percentage' | 'fixed_amount' | 'free_shipping';
+  /**
+   * Percentage (e.g., 20 = 20%) or amount in cents (e.g., 1000 = $10.00).
+   */
+  value: number;
+  /**
+   * Minimum cart total in cents (0 = no minimum).
+   */
+  minOrderAmount?: number | null;
+  /**
+   * Max discount in cents for percentage type (0 = no cap).
+   */
+  maxDiscountAmount?: number | null;
+  /**
+   * Total uses allowed (0 = unlimited).
+   */
+  maxUses?: number | null;
+  /**
+   * Per-customer limit (0 = unlimited).
+   */
+  maxUsesPerCustomer?: number | null;
+  /**
+   * Auto-incremented when coupon is applied at checkout.
+   */
+  usedCount?: number | null;
+  stackable?: boolean | null;
+  firstOrderOnly?: boolean | null;
+  startsAt: string;
+  expiresAt: string;
+  applicableTo: 'all_products' | 'specific_categories' | 'specific_products';
+  categories?: (string | Category)[] | null;
+  products?: (string | Product)[] | null;
+  /**
+   * Categories excluded even from "all products".
+   */
+  excludeCategories?: (string | Category)[] | null;
+  /**
+   * Products excluded even from applicable categories.
+   */
+  excludeProducts?: (string | Product)[] | null;
+  /**
+   * Must be approved before activation takes effect.
+   */
+  active?: boolean | null;
+  /**
+   * Submit for review to get admin approval before publishing.
+   */
+  approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
+  reviewedBy?: (string | null) | Team;
+  /**
+   * Feedback from the reviewer.
+   */
+  reviewNotes?: string | null;
+  submittedForReviewAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offers".
+ */
+export interface Offer {
+  id: string;
+  /**
+   * Display name (e.g., "Summer Sale").
+   */
+  title: string;
+  /**
+   * URL-friendly identifier.
+   */
+  slug: string;
+  /**
+   * Longer description for storefront display.
+   */
+  description?: string | null;
+  type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_shipping' | 'bundle';
+  /**
+   * Percentage (e.g., 20 = 20%) or amount in cents (e.g., 1000 = $10.00).
+   */
+  value?: number | null;
+  /**
+   * Buy X items...
+   */
+  buyQuantity?: number | null;
+  /**
+   * ...get Y free (cheapest free).
+   */
+  getQuantity?: number | null;
+  /**
+   * Products included in the bundle.
+   */
+  bundleProducts?: (string | Product)[] | null;
+  /**
+   * Special bundle price in cents.
+   */
+  bundlePrice?: number | null;
+  startsAt: string;
+  endsAt: string;
+  applicableTo: 'all_products' | 'specific_categories' | 'specific_products';
+  categories?: (string | Category)[] | null;
+  products?: (string | Product)[] | null;
+  showBanner?: boolean | null;
+  /**
+   * Banner text (e.g., "20% off everything — ends Sunday").
+   */
+  bannerText?: string | null;
+  bannerPosition?: ('header' | 'product_page' | 'cart' | 'all') | null;
+  showBadge?: boolean | null;
+  /**
+   * Badge text (e.g., "SALE", "-20%", "2 FOR 1").
+   */
+  badgeText?: string | null;
+  /**
+   * Higher priority wins when multiple offers overlap.
+   */
+  priority?: number | null;
+  /**
+   * If false, offer is display-only (no automatic discount).
+   */
+  autoApply?: boolean | null;
+  /**
+   * Must be approved before activation takes effect.
+   */
+  active?: boolean | null;
+  /**
+   * Submit for review to get admin approval before publishing.
+   */
+  approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
+  reviewedBy?: (string | null) | Team;
+  /**
+   * Feedback from the reviewer.
+   */
+  reviewNotes?: string | null;
+  submittedForReviewAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-catalog".
+ */
+export interface PrintifyCatalog {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-launcher".
+ */
+export interface PrintifyLauncher {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-design-studio".
+ */
+export interface PrintifyDesignStudio {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-analysis".
+ */
+export interface PrintifyAnalysis {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-fulfillment".
+ */
+export interface PrintifyFulfillment {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-catalog-cache".
+ */
+export interface PrintifyCatalogCache {
+  id: string;
+  blueprintId: number;
+  providerId: number;
+  blueprintTitle?: string | null;
+  blueprintBrand?: string | null;
+  blueprintModel?: string | null;
+  blueprintImages?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  providerTitle?: string | null;
+  decorationMethods?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  category?: string | null;
+  minCost?: number | null;
+  maxCost?: number | null;
+  shippingCostUs?: number | null;
+  handlingTime?: string | null;
+  targetRetail?: number | null;
+  marginPercent?: number | null;
+  profitPerUnit?: number | null;
+  totalVariants?: number | null;
+  enabledVariants?: number | null;
+  availableColors?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  brandColorsAvailable?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  brandColorCount?: number | null;
+  availableSizes?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  sizeRange?: string | null;
+  printAreaFront?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  printAreaBack?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  printAreaCount?: number | null;
+  score?: number | null;
+  scoreBreakdown?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  lastSyncedAt?: string | null;
+  firstSeenAt?: string | null;
+  syncVersion?: number | null;
+  status?: ('active' | 'discontinued' | 'error') | null;
+  lastSyncError?: string | null;
+  dataHash?: string | null;
+  /**
+   * Full variant array with IDs, parsed colors/sizes, per-variant cost
+   */
+  variants?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-sync-log".
+ */
+export interface PrintifySyncLog {
+  id: string;
+  syncId: string;
+  type?: ('full' | 'incremental' | 'category') | null;
+  triggeredBy?: string | null;
+  triggeredByUser?: string | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+  durationMs?: number | null;
+  status?: ('completed' | 'failed' | 'partial') | null;
+  blueprintsTotal?: number | null;
+  blueprintsProcessed?: number | null;
+  blueprintsSkipped?: number | null;
+  providersProcessed?: number | null;
+  skusScored?: number | null;
+  skusNew?: number | null;
+  skusUpdated?: number | null;
+  skusUnchanged?: number | null;
+  skusRemoved?: number | null;
+  skusError?: number | null;
+  apiCalls?: number | null;
+  apiErrors?: number | null;
+  rateLimitHits?: number | null;
+  changes?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  syncErrors?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "r2-browser".
+ */
+export interface R2Browser {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-uploads".
+ */
+export interface BulkUpload {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-reads".
+ */
+export interface BulkRead {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-feedback".
+ */
+export interface BulkFeedback {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-product-analysis-cache".
+ */
+export interface AiProductAnalysisCache {
+  id: string;
+  /**
+   * SHA-256 hash of the image content
+   */
+  imageHash: string;
+  /**
+   * Version number (1 = first analysis, max 5)
+   */
+  version: number;
+  /**
+   * Product name at time of analysis
+   */
+  productName?: string | null;
+  category?: string | null;
+  /**
+   * AI model used for analysis
+   */
+  model?: string | null;
+  /**
+   * AI analysis result (visibleText, description, features, etc.)
+   */
+  analysis:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1127,7 +2206,7 @@ export interface PayloadMcpApiKey {
   /**
    * The user that the API key is associated with.
    */
-  user: string | User;
+  user: string | Team;
   /**
    * A useful label for the API key.
    */
@@ -1168,8 +2247,8 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'customers';
+        value: string | Customer;
       } | null)
     | ({
         relationTo: 'pages';
@@ -1188,12 +2267,100 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'forms';
-        value: string | Form;
+        relationTo: 'team';
+        value: string | Team;
       } | null)
     | ({
-        relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        relationTo: 'global-keys';
+        value: string | GlobalKey;
+      } | null)
+    | ({
+        relationTo: 'my-keys';
+        value: string | MyKey;
+      } | null)
+    | ({
+        relationTo: 'subscribers';
+        value: string | Subscriber;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: string | Redirect;
+      } | null)
+    | ({
+        relationTo: 'coupons';
+        value: string | Coupon;
+      } | null)
+    | ({
+        relationTo: 'offers';
+        value: string | Offer;
+      } | null)
+    | ({
+        relationTo: 'buckets';
+        value: string | Bucket;
+      } | null)
+    | ({
+        relationTo: 'ai-graphics';
+        value: string | AiGraphic;
+      } | null)
+    | ({
+        relationTo: 'designs';
+        value: string | Design;
+      } | null)
+    | ({
+        relationTo: 'printify-catalog';
+        value: string | PrintifyCatalog;
+      } | null)
+    | ({
+        relationTo: 'printify-launcher';
+        value: string | PrintifyLauncher;
+      } | null)
+    | ({
+        relationTo: 'printify-design-studio';
+        value: string | PrintifyDesignStudio;
+      } | null)
+    | ({
+        relationTo: 'printify-analysis';
+        value: string | PrintifyAnalysis;
+      } | null)
+    | ({
+        relationTo: 'printify-fulfillment';
+        value: string | PrintifyFulfillment;
+      } | null)
+    | ({
+        relationTo: 'design-presets';
+        value: string | DesignPreset;
+      } | null)
+    | ({
+        relationTo: 'ai-model-registry';
+        value: string | AiModelRegistry;
+      } | null)
+    | ({
+        relationTo: 'printify-catalog-cache';
+        value: string | PrintifyCatalogCache;
+      } | null)
+    | ({
+        relationTo: 'printify-sync-log';
+        value: string | PrintifySyncLog;
+      } | null)
+    | ({
+        relationTo: 'r2-browser';
+        value: string | R2Browser;
+      } | null)
+    | ({
+        relationTo: 'bulk-uploads';
+        value: string | BulkUpload;
+      } | null)
+    | ({
+        relationTo: 'bulk-reads';
+        value: string | BulkRead;
+      } | null)
+    | ({
+        relationTo: 'bulk-feedback';
+        value: string | BulkFeedback;
+      } | null)
+    | ({
+        relationTo: 'ai-product-analysis-cache';
+        value: string | AiProductAnalysisCache;
       } | null)
     | ({
         relationTo: 'addresses';
@@ -1228,14 +2395,26 @@ export interface PayloadLockedDocument {
         value: string | Transaction;
       } | null)
     | ({
+        relationTo: 'forms';
+        value: string | Form;
+      } | null)
+    | ({
+        relationTo: 'form-submissions';
+        value: string | FormSubmission;
+      } | null)
+    | ({
         relationTo: 'payload-mcp-api-keys';
         value: string | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
   user:
     | {
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'customers';
+        value: string | Customer;
+      }
+    | {
+        relationTo: 'team';
+        value: string | Team;
       }
     | {
         relationTo: 'payload-mcp-api-keys';
@@ -1252,8 +2431,12 @@ export interface PayloadPreference {
   id: string;
   user:
     | {
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'customers';
+        value: string | Customer;
+      }
+    | {
+        relationTo: 'team';
+        value: string | Team;
       }
     | {
         relationTo: 'payload-mcp-api-keys';
@@ -1285,12 +2468,13 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "customers_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface CustomersSelect<T extends boolean = true> {
   name?: T;
   avatar?: T;
-  roles?: T;
+  phone?: T;
+  marketingOptIn?: T;
   orders?: T;
   cart?: T;
   addresses?: T;
@@ -1497,6 +2681,10 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   status?: T;
   publishedAt?: T;
+  approvalStatus?: T;
+  reviewedBy?: T;
+  reviewNotes?: T;
+  submittedForReviewAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1508,6 +2696,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   generateSlug?: T;
   slug?: T;
+  showOnStorefront?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1518,6 +2707,8 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  hasHash?: T;
+  imageHash?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1529,6 +2720,692 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  avatar?: T;
+  role?: T;
+  aiKeys?:
+    | T
+    | {
+        anthropicKeyLabel?: T;
+        anthropicKey?: T;
+        bflKeyLabel?: T;
+        bflKey?: T;
+        geminiKeyLabel?: T;
+        geminiKey?: T;
+        openaiKeyLabel?: T;
+        openaiKey?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "global-keys_select".
+ */
+export interface GlobalKeysSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "my-keys_select".
+ */
+export interface MyKeysSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers_select".
+ */
+export interface SubscribersSelect<T extends boolean = true> {
+  email?: T;
+  source?: T;
+  subscribedAt?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coupons_select".
+ */
+export interface CouponsSelect<T extends boolean = true> {
+  title?: T;
+  code?: T;
+  description?: T;
+  type?: T;
+  value?: T;
+  minOrderAmount?: T;
+  maxDiscountAmount?: T;
+  maxUses?: T;
+  maxUsesPerCustomer?: T;
+  usedCount?: T;
+  stackable?: T;
+  firstOrderOnly?: T;
+  startsAt?: T;
+  expiresAt?: T;
+  applicableTo?: T;
+  categories?: T;
+  products?: T;
+  excludeCategories?: T;
+  excludeProducts?: T;
+  active?: T;
+  approvalStatus?: T;
+  reviewedBy?: T;
+  reviewNotes?: T;
+  submittedForReviewAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offers_select".
+ */
+export interface OffersSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  type?: T;
+  value?: T;
+  buyQuantity?: T;
+  getQuantity?: T;
+  bundleProducts?: T;
+  bundlePrice?: T;
+  startsAt?: T;
+  endsAt?: T;
+  applicableTo?: T;
+  categories?: T;
+  products?: T;
+  showBanner?: T;
+  bannerText?: T;
+  bannerPosition?: T;
+  showBadge?: T;
+  badgeText?: T;
+  priority?: T;
+  autoApply?: T;
+  active?: T;
+  approvalStatus?: T;
+  reviewedBy?: T;
+  reviewNotes?: T;
+  submittedForReviewAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buckets_select".
+ */
+export interface BucketsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  description?: T;
+  status?: T;
+  color?: T;
+  products?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-graphics_select".
+ */
+export interface AiGraphicsSelect<T extends boolean = true> {
+  title?: T;
+  imageFile?: T;
+  imageUrl?: T;
+  palette?: T;
+  style?: T;
+  orientation?: T;
+  generationPrompt?: T;
+  imageModel?: T;
+  generationCost?: T;
+  width?: T;
+  height?: T;
+  usageCount?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designs_select".
+ */
+export interface DesignsSelect<T extends boolean = true> {
+  title?: T;
+  ulTitle?: T;
+  designFile?: T;
+  designUrl?: T;
+  thumbnail?: T;
+  type?: T;
+  designLane?: T;
+  emotionTier?: T;
+  emotionPrimary?: T;
+  forCategories?: T;
+  forGarmentColors?: T;
+  printText?: T;
+  fontInfo?: T;
+  generatedBy?: T;
+  generationPrompt?: T;
+  generationCost?: T;
+  promptModel?: T;
+  imageModel?: T;
+  imageModelDisplayName?: T;
+  generatedAt?: T;
+  generationTimeSeconds?: T;
+  generatedByUser?: T;
+  preset?: T;
+  usageCount?: T;
+  isPinned?: T;
+  tags?: T;
+  status?: T;
+  printWidth?: T;
+  printHeight?: T;
+  dpi?: T;
+  sourceGraphic?: T;
+  alsoInMedia?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-catalog_select".
+ */
+export interface PrintifyCatalogSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-launcher_select".
+ */
+export interface PrintifyLauncherSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-design-studio_select".
+ */
+export interface PrintifyDesignStudioSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-analysis_select".
+ */
+export interface PrintifyAnalysisSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-fulfillment_select".
+ */
+export interface PrintifyFulfillmentSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design-presets_select".
+ */
+export interface DesignPresetsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  promptModel?: T;
+  detailLevel?: T;
+  skipAiPrompt?: T;
+  templatePrompt?: T;
+  imageModel?: T;
+  defaultCount?: T;
+  generationMode?: T;
+  category?: T;
+  garmentColor?: T;
+  designType?: T;
+  designLane?: T;
+  emotionTier?: T;
+  timesUsed?: T;
+  lastUsedAt?: T;
+  designsGenerated?: T;
+  createdByUser?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-model-registry_select".
+ */
+export interface AiModelRegistrySelect<T extends boolean = true> {
+  modelId?: T;
+  displayName?: T;
+  family?: T;
+  version?: T;
+  provider?: T;
+  modelType?: T;
+  tag?: T;
+  costPerImage?: T;
+  costPer1kInputTokens?: T;
+  costPer1kOutputTokens?: T;
+  isEnabled?: T;
+  isDefault?: T;
+  source?: T;
+  lastVerifiedAt?: T;
+  isDeprecated?: T;
+  shortDescription?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-catalog-cache_select".
+ */
+export interface PrintifyCatalogCacheSelect<T extends boolean = true> {
+  blueprintId?: T;
+  providerId?: T;
+  blueprintTitle?: T;
+  blueprintBrand?: T;
+  blueprintModel?: T;
+  blueprintImages?: T;
+  providerTitle?: T;
+  decorationMethods?: T;
+  category?: T;
+  minCost?: T;
+  maxCost?: T;
+  shippingCostUs?: T;
+  handlingTime?: T;
+  targetRetail?: T;
+  marginPercent?: T;
+  profitPerUnit?: T;
+  totalVariants?: T;
+  enabledVariants?: T;
+  availableColors?: T;
+  brandColorsAvailable?: T;
+  brandColorCount?: T;
+  availableSizes?: T;
+  sizeRange?: T;
+  printAreaFront?: T;
+  printAreaBack?: T;
+  printAreaCount?: T;
+  score?: T;
+  scoreBreakdown?: T;
+  lastSyncedAt?: T;
+  firstSeenAt?: T;
+  syncVersion?: T;
+  status?: T;
+  lastSyncError?: T;
+  dataHash?: T;
+  variants?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-sync-log_select".
+ */
+export interface PrintifySyncLogSelect<T extends boolean = true> {
+  syncId?: T;
+  type?: T;
+  triggeredBy?: T;
+  triggeredByUser?: T;
+  startedAt?: T;
+  completedAt?: T;
+  durationMs?: T;
+  status?: T;
+  blueprintsTotal?: T;
+  blueprintsProcessed?: T;
+  blueprintsSkipped?: T;
+  providersProcessed?: T;
+  skusScored?: T;
+  skusNew?: T;
+  skusUpdated?: T;
+  skusUnchanged?: T;
+  skusRemoved?: T;
+  skusError?: T;
+  apiCalls?: T;
+  apiErrors?: T;
+  rateLimitHits?: T;
+  changes?: T;
+  syncErrors?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "r2-browser_select".
+ */
+export interface R2BrowserSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-uploads_select".
+ */
+export interface BulkUploadsSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-reads_select".
+ */
+export interface BulkReadsSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-feedback_select".
+ */
+export interface BulkFeedbackSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-product-analysis-cache_select".
+ */
+export interface AiProductAnalysisCacheSelect<T extends boolean = true> {
+  imageHash?: T;
+  version?: T;
+  productName?: T;
+  category?: T;
+  model?: T;
+  analysis?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses_select".
+ */
+export interface AddressesSelect<T extends boolean = true> {
+  customer?: T;
+  title?: T;
+  firstName?: T;
+  lastName?: T;
+  company?: T;
+  addressLine1?: T;
+  addressLine2?: T;
+  city?: T;
+  state?: T;
+  postalCode?: T;
+  country?: T;
+  phone?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variants_select".
+ */
+export interface VariantsSelect<T extends boolean = true> {
+  title?: T;
+  product?: T;
+  options?: T;
+  inventory?: T;
+  priceInUSDEnabled?: T;
+  priceInUSD?: T;
+  printifyVariantId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variantTypes_select".
+ */
+export interface VariantTypesSelect<T extends boolean = true> {
+  label?: T;
+  name?: T;
+  options?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variantOptions_select".
+ */
+export interface VariantOptionsSelect<T extends boolean = true> {
+  _variantOptions_options_order?: T;
+  variantType?: T;
+  label?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        variantOption?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        cta?: T | CallToActionBlockSelect<T>;
+        content?: T | ContentBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+      };
+  inventory?: T;
+  enableVariants?: T;
+  variantTypes?: T;
+  variants?: T;
+  priceInUSDEnabled?: T;
+  priceInUSD?: T;
+  relatedProducts?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  categories?: T;
+  buckets?: T;
+  generateSlug?: T;
+  slug?: T;
+  approvalStatus?: T;
+  reviewedBy?: T;
+  reviewNotes?: T;
+  submittedForReviewAt?: T;
+  design?: T;
+  printFile?: T;
+  printifyConfig?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "carts_select".
+ */
+export interface CartsSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        product?: T;
+        variant?: T;
+        quantity?: T;
+        id?: T;
+      };
+  secret?: T;
+  customer?: T;
+  purchasedAt?: T;
+  status?: T;
+  subtotal?: T;
+  currency?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  isLocked?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        variant?: T;
+        quantity?: T;
+        id?: T;
+      };
+  shippingAddress?:
+    | T
+    | {
+        title?: T;
+        firstName?: T;
+        lastName?: T;
+        company?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
+  customer?: T;
+  customerEmail?: T;
+  transactions?: T;
+  status?: T;
+  amount?: T;
+  currency?: T;
+  source?: T;
+  notes?:
+    | T
+    | {
+        text?: T;
+        addedBy?: T;
+        addedAt?: T;
+        id?: T;
+      };
+  accessToken?: T;
+  printifyOrderId?: T;
+  fulfillmentStatus?: T;
+  trackingNumber?: T;
+  trackingCarrier?: T;
+  trackingUrl?: T;
+  fulfillmentNote?: T;
+  fulfillmentHistory?:
+    | T
+    | {
+        status?: T;
+        message?: T;
+        source?: T;
+        trackingNumber?: T;
+        trackingCarrier?: T;
+        trackingUrl?: T;
+        timestamp?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  isLocked?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        variant?: T;
+        quantity?: T;
+        id?: T;
+      };
+  paymentMethod?: T;
+  stripe?:
+    | T
+    | {
+        customerID?: T;
+        paymentIntentID?: T;
+      };
+  billingAddress?:
+    | T
+    | {
+        title?: T;
+        firstName?: T;
+        lastName?: T;
+        company?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
+  status?: T;
+  customer?: T;
+  customerEmail?: T;
+  order?: T;
+  cart?: T;
+  amount?: T;
+  currency?: T;
+  source?: T;
+  notes?:
+    | T
+    | {
+        text?: T;
+        addedBy?: T;
+        addedAt?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1681,215 +3558,6 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses_select".
- */
-export interface AddressesSelect<T extends boolean = true> {
-  customer?: T;
-  title?: T;
-  firstName?: T;
-  lastName?: T;
-  company?: T;
-  addressLine1?: T;
-  addressLine2?: T;
-  city?: T;
-  state?: T;
-  postalCode?: T;
-  country?: T;
-  phone?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variants_select".
- */
-export interface VariantsSelect<T extends boolean = true> {
-  title?: T;
-  product?: T;
-  options?: T;
-  inventory?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantTypes_select".
- */
-export interface VariantTypesSelect<T extends boolean = true> {
-  label?: T;
-  name?: T;
-  options?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantOptions_select".
- */
-export interface VariantOptionsSelect<T extends boolean = true> {
-  _variantOptions_options_order?: T;
-  variantType?: T;
-  label?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products_select".
- */
-export interface ProductsSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
-  gallery?:
-    | T
-    | {
-        image?: T;
-        variantOption?: T;
-        id?: T;
-      };
-  layout?:
-    | T
-    | {
-        cta?: T | CallToActionBlockSelect<T>;
-        content?: T | ContentBlockSelect<T>;
-        mediaBlock?: T | MediaBlockSelect<T>;
-      };
-  inventory?: T;
-  enableVariants?: T;
-  variantTypes?: T;
-  variants?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
-  relatedProducts?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        image?: T;
-        description?: T;
-      };
-  categories?: T;
-  generateSlug?: T;
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "carts_select".
- */
-export interface CartsSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        product?: T;
-        variant?: T;
-        quantity?: T;
-        id?: T;
-      };
-  secret?: T;
-  customer?: T;
-  purchasedAt?: T;
-  status?: T;
-  subtotal?: T;
-  currency?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders_select".
- */
-export interface OrdersSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        product?: T;
-        variant?: T;
-        quantity?: T;
-        id?: T;
-      };
-  shippingAddress?:
-    | T
-    | {
-        title?: T;
-        firstName?: T;
-        lastName?: T;
-        company?: T;
-        addressLine1?: T;
-        addressLine2?: T;
-        city?: T;
-        state?: T;
-        postalCode?: T;
-        country?: T;
-        phone?: T;
-      };
-  customer?: T;
-  customerEmail?: T;
-  transactions?: T;
-  status?: T;
-  amount?: T;
-  currency?: T;
-  accessToken?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions_select".
- */
-export interface TransactionsSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        product?: T;
-        variant?: T;
-        quantity?: T;
-        id?: T;
-      };
-  paymentMethod?: T;
-  stripe?:
-    | T
-    | {
-        customerID?: T;
-        paymentIntentID?: T;
-      };
-  billingAddress?:
-    | T
-    | {
-        title?: T;
-        firstName?: T;
-        lastName?: T;
-        company?: T;
-        addressLine1?: T;
-        addressLine2?: T;
-        city?: T;
-        state?: T;
-        postalCode?: T;
-        country?: T;
-        phone?: T;
-      };
-  status?: T;
-  customer?: T;
-  customerEmail?: T;
-  order?: T;
-  cart?: T;
-  amount?: T;
-  currency?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-mcp-api-keys_select".
  */
 export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
@@ -1941,6 +3609,24 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcementBar".
+ */
+export interface AnnouncementBar {
+  id: string;
+  enabled?: boolean | null;
+  text: string;
+  /**
+   * Optional URL. If set, the bar becomes clickable.
+   */
+  link?: string | null;
+  backgroundColor?: ('olive' | 'petrol' | 'bone' | 'black') | null;
+  textColor?: ('light' | 'dark') | null;
+  dismissible?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2037,6 +3723,10 @@ export interface Homepage {
   id: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   showFrameMarks?: boolean | null;
   showHero?: boolean | null;
   heroStamp?: string | null;
@@ -2107,6 +3797,7 @@ export interface Homepage {
   dropLabel?: string | null;
   dropHeading?: string | null;
   dropTargetDate?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2117,6 +3808,11 @@ export interface Homepage {
 export interface ThesisPage {
   id: string;
   metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   showHeader?: boolean | null;
   sectionNumber?: string | null;
   heading?: string | null;
@@ -2136,6 +3832,7 @@ export interface ThesisPage {
   showRules?: boolean | null;
   rulesTerm?: string | null;
   rulesDefinition?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2146,6 +3843,11 @@ export interface ThesisPage {
 export interface LanesPage {
   id: string;
   metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   showHeader?: boolean | null;
   sectionNumber?: string | null;
   heading?: string | null;
@@ -2163,6 +3865,7 @@ export interface LanesPage {
   showNegativeBox?: boolean | null;
   negativeBoxLabel?: string | null;
   negativeBoxContent?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2172,6 +3875,12 @@ export interface LanesPage {
  */
 export interface DropPage {
   id: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   showHeader?: boolean | null;
   sectionNumber?: string | null;
   heading?: string | null;
@@ -2180,6 +3889,7 @@ export interface DropPage {
   targetDate?: string | null;
   showFooterNote?: boolean | null;
   footerNote?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2189,6 +3899,12 @@ export interface DropPage {
  */
 export interface ContactPage {
   id: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionNumber?: string | null;
   heading?: string | null;
   showInfoColumn?: boolean | null;
@@ -2207,6 +3923,7 @@ export interface ContactPage {
   successLabel?: string | null;
   successHeading?: string | null;
   successMessage?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2216,6 +3933,12 @@ export interface ContactPage {
  */
 export interface FaqPage {
   id: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionLabel?: string | null;
   heading?: string | null;
   categories?:
@@ -2235,6 +3958,7 @@ export interface FaqPage {
     | null;
   showFooterCta?: boolean | null;
   footerCtaText?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2246,6 +3970,10 @@ export interface ShippingReturnsPage {
   id: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionLabel?: string | null;
   heading?: string | null;
   show_howItWorks?: boolean | null;
@@ -2278,6 +4006,7 @@ export interface ShippingReturnsPage {
   show_damaged?: boolean | null;
   damaged_title?: string | null;
   damaged_content?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2289,6 +4018,10 @@ export interface SizeGuidePage {
   id: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionLabel?: string | null;
   heading?: string | null;
   subtext?: string | null;
@@ -2316,6 +4049,7 @@ export interface SizeGuidePage {
   show_fitNote?: boolean | null;
   fitNoteLabel?: string | null;
   fitNoteContent?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2327,6 +4061,10 @@ export interface PrivacyPage {
   id: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionLabel?: string | null;
   heading?: string | null;
   lastUpdated?: string | null;
@@ -2346,6 +4084,7 @@ export interface PrivacyPage {
         id?: string | null;
       }[]
     | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2357,6 +4096,10 @@ export interface TermsPage {
   id: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  /**
+   * Social sharing image (1200×630 recommended).
+   */
+  metaImage?: (string | null) | Media;
   sectionLabel?: string | null;
   heading?: string | null;
   lastUpdated?: string | null;
@@ -2371,8 +4114,186 @@ export interface TermsPage {
     | null;
   showFooterCta?: boolean | null;
   footerCtaText?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * Default Printify configuration per product category. Used by the Product Launcher for auto-populating blueprint, provider, sizes, colors, and placement.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-defaults".
+ */
+export interface PrintifyDefault {
+  id: string;
+  /**
+   * Minimum acceptable margin percentage. Products below this will be flagged in SKU Analysis.
+   */
+  marginTarget?: number | null;
+  /**
+   * Default sizes to enable when launching new products. JSON array of size strings.
+   */
+  defaultSizes?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Default garment colors to auto-select when launching. JSON array of color names.
+   */
+  brandColors?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Number of AI-generated editorial images per product.
+   */
+  editorialShotCount?: number | null;
+  /**
+   * Default Printify blueprint and provider per product category.
+   */
+  categoryDefaults?:
+    | {
+        category: 'hoodies' | 'tees' | 'hats' | 'totes' | 'sweatshirts';
+        /**
+         * Printify blueprint ID (from Catalog Browser)
+         */
+        blueprintId?: number | null;
+        /**
+         * Printify print provider ID
+         */
+        providerId?: number | null;
+        /**
+         * Default retail price for this category
+         */
+        defaultPrice?: number | null;
+        /**
+         * Default design to use for this category (can be overridden per product)
+         */
+        designKey?:
+          | (
+              | 'logo-horiz-light'
+              | 'logo-horiz-dark'
+              | 'logo-icon-light'
+              | 'logo-icon-dark'
+              | 'logo-word-light'
+              | 'logo-word-dark'
+            )
+          | null;
+        placement?: {
+          position?: ('front' | 'back') | null;
+          /**
+           * 0 = left, 0.5 = center, 1 = right
+           */
+          x?: number | null;
+          /**
+           * 0 = top, 0.5 = center, 1 = bottom
+           */
+          y?: number | null;
+          /**
+           * 0.1 = tiny, 0.5 = half, 1.0 = fill print area
+           */
+          scale?: number | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Weights for the SKU scoring algorithm in the Catalog Browser. Must sum to 100.
+   */
+  scoringWeights?: {
+    margin?: number | null;
+    blankQuality?: number | null;
+    colorAvailability?: number | null;
+    sizeRange?: number | null;
+    printArea?: number | null;
+    providerLocation?: number | null;
+    shippingCost?: number | null;
+    printMethod?: number | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * API keys for AI services (encrypted in database). Model preferences and cost tracking.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-settings".
+ */
+export interface AiSetting {
+  id: string;
+  anthropicKeyLabel?: string | null;
+  /**
+   * For prompt engineering. Get from console.anthropic.com/settings/keys
+   */
+  anthropicKey?: string | null;
+  bflKeyLabel?: string | null;
+  /**
+   * For FLUX image generation. Get from api.bfl.ai
+   */
+  bflKey?: string | null;
+  geminiKeyLabel?: string | null;
+  /**
+   * For Gemini Flash image generation. Get from aistudio.google.com/apikey
+   */
+  geminiKey?: string | null;
+  openaiKeyLabel?: string | null;
+  /**
+   * Optional — for GPT Image creative designs. Get from platform.openai.com/api-keys
+   */
+  openaiKey?: string | null;
+  /**
+   * Default Claude model for prompt engineering. Can be overridden per generation.
+   */
+  defaultPromptModel?: (string | null) | AiModelRegistry;
+  /**
+   * Default image generation model. Can be overridden per generation.
+   */
+  defaultImageModel?: (string | null) | AiModelRegistry;
+  defaultDetailLevel?: ('low' | 'medium' | 'high' | 'very-high') | null;
+  defaultBatchCount?: number | null;
+  /**
+   * Total USD spent on AI generation (all users, all time)
+   */
+  totalSpent?: number | null;
+  /**
+   * USD spent this month (resets monthly)
+   */
+  monthlySpent?: number | null;
+  /**
+   * Warning shown when monthly spend approaches this amount. 0 = no limit.
+   */
+  monthlyBudget?: number | null;
+  /**
+   * YYYY-MM of last monthly reset
+   */
+  lastResetMonth?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcementBar_select".
+ */
+export interface AnnouncementBarSelect<T extends boolean = true> {
+  enabled?: T;
+  text?: T;
+  link?: T;
+  backgroundColor?: T;
+  textColor?: T;
+  dismissible?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2455,6 +4376,7 @@ export interface FooterSelect<T extends boolean = true> {
 export interface HomepageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
+  metaImage?: T;
   showFrameMarks?: T;
   showHero?: T;
   heroStamp?: T;
@@ -2525,6 +4447,7 @@ export interface HomepageSelect<T extends boolean = true> {
   dropLabel?: T;
   dropHeading?: T;
   dropTargetDate?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2535,6 +4458,8 @@ export interface HomepageSelect<T extends boolean = true> {
  */
 export interface ThesisPageSelect<T extends boolean = true> {
   metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
   showHeader?: T;
   sectionNumber?: T;
   heading?: T;
@@ -2554,6 +4479,7 @@ export interface ThesisPageSelect<T extends boolean = true> {
   showRules?: T;
   rulesTerm?: T;
   rulesDefinition?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2564,6 +4490,8 @@ export interface ThesisPageSelect<T extends boolean = true> {
  */
 export interface LanesPageSelect<T extends boolean = true> {
   metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
   showHeader?: T;
   sectionNumber?: T;
   heading?: T;
@@ -2581,6 +4509,7 @@ export interface LanesPageSelect<T extends boolean = true> {
   showNegativeBox?: T;
   negativeBoxLabel?: T;
   negativeBoxContent?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2590,6 +4519,9 @@ export interface LanesPageSelect<T extends boolean = true> {
  * via the `definition` "dropPage_select".
  */
 export interface DropPageSelect<T extends boolean = true> {
+  metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
   showHeader?: T;
   sectionNumber?: T;
   heading?: T;
@@ -2598,6 +4530,7 @@ export interface DropPageSelect<T extends boolean = true> {
   targetDate?: T;
   showFooterNote?: T;
   footerNote?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2607,6 +4540,9 @@ export interface DropPageSelect<T extends boolean = true> {
  * via the `definition` "contactPage_select".
  */
 export interface ContactPageSelect<T extends boolean = true> {
+  metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
   sectionNumber?: T;
   heading?: T;
   showInfoColumn?: T;
@@ -2625,6 +4561,7 @@ export interface ContactPageSelect<T extends boolean = true> {
   successLabel?: T;
   successHeading?: T;
   successMessage?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2634,6 +4571,9 @@ export interface ContactPageSelect<T extends boolean = true> {
  * via the `definition` "faqPage_select".
  */
 export interface FaqPageSelect<T extends boolean = true> {
+  metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
   sectionLabel?: T;
   heading?: T;
   categories?:
@@ -2653,6 +4593,7 @@ export interface FaqPageSelect<T extends boolean = true> {
       };
   showFooterCta?: T;
   footerCtaText?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2664,6 +4605,7 @@ export interface FaqPageSelect<T extends boolean = true> {
 export interface ShippingReturnsPageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
+  metaImage?: T;
   sectionLabel?: T;
   heading?: T;
   show_howItWorks?: T;
@@ -2696,6 +4638,7 @@ export interface ShippingReturnsPageSelect<T extends boolean = true> {
   show_damaged?: T;
   damaged_title?: T;
   damaged_content?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2707,6 +4650,7 @@ export interface ShippingReturnsPageSelect<T extends boolean = true> {
 export interface SizeGuidePageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
+  metaImage?: T;
   sectionLabel?: T;
   heading?: T;
   subtext?: T;
@@ -2734,6 +4678,7 @@ export interface SizeGuidePageSelect<T extends boolean = true> {
   show_fitNote?: T;
   fitNoteLabel?: T;
   fitNoteContent?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2745,6 +4690,7 @@ export interface SizeGuidePageSelect<T extends boolean = true> {
 export interface PrivacyPageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
+  metaImage?: T;
   sectionLabel?: T;
   heading?: T;
   lastUpdated?: T;
@@ -2764,6 +4710,7 @@ export interface PrivacyPageSelect<T extends boolean = true> {
         paragraph?: T;
         id?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2775,6 +4722,7 @@ export interface PrivacyPageSelect<T extends boolean = true> {
 export interface TermsPageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
+  metaImage?: T;
   sectionLabel?: T;
   heading?: T;
   lastUpdated?: T;
@@ -2789,6 +4737,75 @@ export interface TermsPageSelect<T extends boolean = true> {
       };
   showFooterCta?: T;
   footerCtaText?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "printify-defaults_select".
+ */
+export interface PrintifyDefaultsSelect<T extends boolean = true> {
+  marginTarget?: T;
+  defaultSizes?: T;
+  brandColors?: T;
+  editorialShotCount?: T;
+  categoryDefaults?:
+    | T
+    | {
+        category?: T;
+        blueprintId?: T;
+        providerId?: T;
+        defaultPrice?: T;
+        designKey?: T;
+        placement?:
+          | T
+          | {
+              position?: T;
+              x?: T;
+              y?: T;
+              scale?: T;
+            };
+        id?: T;
+      };
+  scoringWeights?:
+    | T
+    | {
+        margin?: T;
+        blankQuality?: T;
+        colorAvailability?: T;
+        sizeRange?: T;
+        printArea?: T;
+        providerLocation?: T;
+        shippingCost?: T;
+        printMethod?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-settings_select".
+ */
+export interface AiSettingsSelect<T extends boolean = true> {
+  anthropicKeyLabel?: T;
+  anthropicKey?: T;
+  bflKeyLabel?: T;
+  bflKey?: T;
+  geminiKeyLabel?: T;
+  geminiKey?: T;
+  openaiKeyLabel?: T;
+  openaiKey?: T;
+  defaultPromptModel?: T;
+  defaultImageModel?: T;
+  defaultDetailLevel?: T;
+  defaultBatchCount?: T;
+  totalSpent?: T;
+  monthlySpent?: T;
+  monthlyBudget?: T;
+  lastResetMonth?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

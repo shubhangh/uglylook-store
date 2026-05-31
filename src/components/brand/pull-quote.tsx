@@ -16,7 +16,7 @@ export function PullQuote({ data }: Props) {
           <p className={styles.quote}>
             {parts[0]}<em className={styles.em}>{emWord}</em>{parts.slice(1).join(emWord)}
           </p>
-          <span className={styles.meta}>{data.pullQuoteMetaRight || 'UL · v1.3'}</span>
+          <span className={styles.meta}>{data.pullQuoteMetaRight || 'UL · SS27'}</span>
         </div>
       </div>
     </section>

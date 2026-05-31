@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useLivePreview } from '@payloadcms/live-preview-react'
+import { getClientSideURL } from '@/utilities/getURL'
 import {
   Accordion,
   AccordionItem,
@@ -9,7 +11,12 @@ import {
 } from '@/components/ui/accordion'
 import type { FaqPage } from '@/payload-types'
 
-export default function FaqClient({ data }: { data: FaqPage }) {
+export function FaqClient({ data: initialData }: { data: FaqPage }) {
+  const { data } = useLivePreview<FaqPage>({
+    initialData,
+    serverURL: getClientSideURL(),
+    depth: 1,
+  })
   const [activeSection, setActiveSection] = useState<string | null>(null)
 
   const visibleCategories = (data.categories ?? []).filter((cat) => cat.visible ?? true)
@@ -101,14 +108,13 @@ export default function FaqClient({ data }: { data: FaqPage }) {
         {(data.showFooterCta ?? true) && (
           <div className="mt-16 bg-card rounded-lg border border-border p-6 max-w-2xl md:ml-[calc(12rem+4rem)]">
             <p className="text-sm text-foreground/70">
-              {data.footerCtaText || 'Still have questions?'}{' '}
+              {data.footerCtaText || "Still have questions?"}{' '}
               <a
                 href="/contact"
                 className="text-olive-text underline underline-offset-4 hover:text-foreground transition-colors"
               >
-                Contact us
+                Get in touch
               </a>
-              . We read everything. We reply when there&rsquo;s something to say.
             </p>
           </div>
         )}

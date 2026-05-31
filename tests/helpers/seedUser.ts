@@ -4,6 +4,8 @@ import config from '../../src/payload.config.js'
 export const testUser = {
   email: 'dev@payloadcms.com',
   password: 'test',
+  name: 'Test Dev',
+  role: 'admin' as const,
 }
 
 /**
@@ -14,7 +16,7 @@ export async function seedTestUser(): Promise<void> {
 
   // Delete existing test user if any
   await payload.delete({
-    collection: 'users',
+    collection: 'team',
     where: {
       email: {
         equals: testUser.email,
@@ -24,7 +26,7 @@ export async function seedTestUser(): Promise<void> {
 
   // Create fresh test user
   await payload.create({
-    collection: 'users',
+    collection: 'team',
     data: testUser,
   })
 }
@@ -36,7 +38,7 @@ export async function cleanupTestUser(): Promise<void> {
   const payload = await getPayload({ config })
 
   await payload.delete({
-    collection: 'users',
+    collection: 'team',
     where: {
       email: {
         equals: testUser.email,

@@ -10,13 +10,20 @@ import type { Header } from '@/payload-types'
 import { LogoIcon } from '@/components/icons/logo'
 import { usePathname } from 'next/navigation'
 import { useTheme } from '@/providers/Theme'
+import { useLivePreview } from '@payloadcms/live-preview-react'
+import { getClientSideURL } from '@/utilities/getURL'
 import styles from './header.module.css'
 
 type Props = {
   header: Header
 }
 
-export function HeaderClient({ header }: Props) {
+export function HeaderClient({ header: initialData }: Props) {
+  const { data: header } = useLivePreview<Header>({
+    initialData,
+    serverURL: getClientSideURL(),
+    depth: 1,
+  })
   const allItems = header.navItems || []
   const menu = allItems.filter((item) => (item as any).visible ?? true)
   const pathname = usePathname()

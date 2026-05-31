@@ -15,15 +15,19 @@ export function HeroSection({ data }: Props) {
   return (
     <section className={styles.hero}>
       <div className={styles.wrap}>
-        <div className={styles.strip}>
-          <span className={styles.stamp}>
-            <span className={styles.dot} />
-            {data.heroStamp || 'SS27 · QUIET BUILD'}
-          </span>
-          <span />
-          <span className={styles.clock}>{data.heroClock || '23:14 UTC'}</span>
-          <span className={styles.file}>{data.heroFileLabel || 'FILE / 01 — LANDING'}</span>
-        </div>
+        {(data.heroStamp || data.heroClock || data.heroFileLabel) && (
+          <div className={styles.strip}>
+            {data.heroStamp && (
+              <span className={styles.stamp}>
+                <span className={styles.dot} />
+                {data.heroStamp}
+              </span>
+            )}
+            <span />
+            {data.heroClock && <span className={styles.clock}>{data.heroClock}</span>}
+            {data.heroFileLabel && <span className={styles.file}>{data.heroFileLabel}</span>}
+          </div>
+        )}
 
         <h1 className={styles.headline}>
           <span className={styles.line1}>

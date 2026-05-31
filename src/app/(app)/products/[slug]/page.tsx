@@ -1,10 +1,10 @@
 import type { Media, Product } from '@/payload-types'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { GridTileImage } from '@/components/Grid/tile'
 import { Gallery } from '@/components/product/Gallery'
 import { ProductDescription } from '@/components/product/ProductDescription'
 import { ProductAccordion } from '@/components/product/ProductAccordion'
+import { RelatedProducts } from '@/components/product/RelatedProducts'
 import { RichText } from '@/components/RichText'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -94,17 +94,30 @@ export default async function ProductPage({ params }: Args) {
   }
 
   const productJsonLd = {
-    name: product.title,
     '@context': 'https://schema.org',
     '@type': 'Product',
+    name: product.title,
     description: product.description,
     image: metaImage?.url,
+    url: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/products/${product.slug}`,
+    brand: { '@type': 'Brand', name: 'UglyLook' },
+    ...((product as any).sku ? { sku: (product as any).sku } : {}),
     offers: {
       '@type': 'AggregateOffer',
       availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       price: price,
-      priceCurrency: 'usd',
+      priceCurrency: 'USD',
     },
+  }
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/` },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/shop` },
+      { '@type': 'ListItem', position: 3, name: product.title },
+    ],
   }
 
   const relatedProducts =
@@ -115,6 +128,12 @@ export default async function ProductPage({ params }: Args) {
       <script
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(productJsonLd),
+        }}
+        type="application/ld+json"
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
         }}
         type="application/ld+json"
       />
@@ -164,41 +183,6 @@ export default async function ProductPage({ params }: Args) {
       )}
       </div>
     </React.Fragment>
-  )
-}
-
-function RelatedProducts({ products }: { products: Product[] }) {
-  if (!products.length) return null
-
-  return (
-    <div className="py-12">
-      <div className="mb-6">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-olive-text">
-          SEC / 03
-        </span>
-        <h2 className="text-2xl font-bold tracking-[-0.02em] mt-2 text-foreground">
-          Related Products
-        </h2>
-      </div>
-      <ul className="flex w-full gap-4 overflow-x-auto pt-1">
-        {products.map((product) => (
-          <li
-            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
-            key={product.id}
-          >
-            <Link className="relative h-full w-full" href={`/products/${product.slug}`}>
-              <GridTileImage
-                label={{
-                  amount: product.priceInUSD!,
-                  title: product.title,
-                }}
-                media={product.meta?.image as Media}
-              />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   )
 }
 

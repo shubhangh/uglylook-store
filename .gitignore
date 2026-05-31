@@ -3,3 +3,7 @@ node_modules/
 .env
 .env.local
 *.tsbuildinfo
+
+# Media files stored in Cloudflare R2 (not local)
+public/media/*
+!public/media/.gitkeep

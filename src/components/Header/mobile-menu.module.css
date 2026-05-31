@@ -18,6 +18,18 @@
   height: 2px;
   background: var(--foreground);
   border-radius: 1px;
+  transition: transform 200ms ease, opacity 200ms ease;
+  transform-origin: center;
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburgerOpen .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+.hamburgerOpen .hamburgerLine:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 /* ---- Mobile Overlay ---- */
@@ -65,6 +77,9 @@
 }
 
 .mobileThemeToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 13px;
   color: var(--muted-foreground);

@@ -19,7 +19,7 @@ export const homeStaticData: () => RequiredDataFromCollectionSlug<'pages'> = () 
                   format: 0,
                   mode: 'normal',
                   style: '',
-                  text: 'Payload Ecommerce Template',
+                  text: 'UglyLook',
                   version: 1,
                 },
               ],
@@ -81,8 +81,8 @@ export const homeStaticData: () => RequiredDataFromCollectionSlug<'pages'> = () 
     },
     layout: [],
     meta: {
-      description: 'An open-source ecommerce site built with Payload and Next.js.',
-      title: 'Payload Ecommerce Template',
+      description: 'Streetwear tees, hoodies and objects. 240gsm cotton, boxy fit, printed when you order. Ugly is the new sick.',
+      title: 'UglyLook',
     },
     title: 'Home',
   }

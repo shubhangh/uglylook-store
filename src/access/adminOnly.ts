@@ -1,9 +1,7 @@
 import type { Access } from 'payload'
+import { isAtLeastManager } from '@/access/utilities'
 
-import { checkRole } from '@/access/utilities'
-
+/** Allows access for owner, admin, and manager roles. */
 export const adminOnly: Access = ({ req: { user } }) => {
-  if (user) return checkRole(['admin'], user)
-
-  return false
+  return isAtLeastManager(user)
 }

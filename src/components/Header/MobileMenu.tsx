@@ -6,6 +6,7 @@ import { CMSLink } from '@/components/Link'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/providers/Auth'
 import { useTheme } from '@/providers/Theme'
+import { Sun, Moon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -42,10 +43,11 @@ export function MobileMenu({ menu }: Props) {
   return (
     <>
       <button
-        className={styles.hamburger}
-        onClick={() => setIsOpen(true)}
-        aria-label="Open menu"
+        className={`${styles.hamburger} ${isOpen ? styles.hamburgerOpen : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
+        style={isOpen ? { zIndex: 51, position: 'fixed', top: 20, right: 24 } : undefined}
       >
         <span className={styles.hamburgerLine} />
         <span className={styles.hamburgerLine} />
@@ -54,13 +56,6 @@ export function MobileMenu({ menu }: Props) {
 
       {isOpen && (
         <div className={styles.overlay} role="dialog" aria-label="Mobile menu">
-          <button
-            className={styles.closeBtn}
-            onClick={() => setIsOpen(false)}
-            aria-label="Close menu"
-          >
-            &times;
-          </button>
 
           <nav className={styles.mobileNav}>
             <Link href="/" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
@@ -100,6 +95,7 @@ export function MobileMenu({ menu }: Props) {
           </nav>
 
           <button className={styles.mobileThemeToggle} onClick={toggleTheme}>
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
         </div>

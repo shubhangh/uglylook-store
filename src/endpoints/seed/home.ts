@@ -46,7 +46,7 @@ export const homePageData: (args: ProductArgs) => RequiredDataFromCollectionSlug
                   format: 0,
                   mode: 'normal',
                   style: '',
-                  text: 'Payload Ecommerce Template',
+                  text: 'UglyLook',
                   version: 1,
                 },
               ],
@@ -609,10 +609,10 @@ export const homePageData: (args: ProductArgs) => RequiredDataFromCollectionSlug
       },
     ],
     meta: {
-      description: 'An open-source ecommerce site built with Payload and Next.js.',
+      description: 'Streetwear tees, hoodies and objects. 240gsm cotton, boxy fit, printed when you order. Ugly is the new sick.',
       // @ts-ignore
       image: metaImage,
-      title: 'Payload Ecommerce Template',
+      title: 'UglyLook',
     },
     title: 'Home',
   }

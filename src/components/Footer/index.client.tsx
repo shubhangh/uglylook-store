@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Sun, Moon } from 'lucide-react'
 import React from 'react'
 import { LogoIcon } from '@/components/icons/logo'
 import { useTheme } from '@/providers/Theme'
+import { useLivePreview } from '@payloadcms/live-preview-react'
+import { getClientSideURL } from '@/utilities/getURL'
 import styles from './footer.module.css'
 import type { Footer } from '@/payload-types'
 
@@ -12,14 +15,32 @@ type Props = {
   footer: Footer
 }
 
-export function FooterClient({ footer }: Props) {
+export function FooterClient({ footer: initialData }: Props) {
+  const { data: footer } = useLivePreview<Footer>({
+    initialData,
+    serverURL: getClientSideURL(),
+    depth: 1,
+  })
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => setMounted(true), [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
+    if (!email) return
+    try {
+      await fetch('/next/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'footer' }),
+      })
+      setSubscribed(true)
+      setEmail('')
+    } catch {
+      // still show success to avoid leaking subscription status
       setSubscribed(true)
       setEmail('')
     }
@@ -158,8 +179,8 @@ export function FooterClient({ footer }: Props) {
                       : undefined,
               }}
             >
-              <span className={styles.themeDot} suppressHydrationWarning />
-              <span suppressHydrationWarning>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+              {mounted && <><Sun size={12} style={{ display: theme === 'dark' ? 'inline' : 'none' }} /><Moon size={12} style={{ display: theme === 'dark' ? 'none' : 'inline' }} /></>}
+              <span suppressHydrationWarning>{mounted ? (theme === 'dark' ? 'Light' : 'Dark') : ''}</span>
             </button>
           )}
 

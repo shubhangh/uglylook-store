@@ -1,12 +1,24 @@
 import type { GlobalConfig } from 'payload'
 
 import { adminOnly } from '@/access/adminOnly'
+import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
+import { revalidateGlobal } from './hooks/revalidateGlobal'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
   access: {
     read: () => true,
     update: adminOnly,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Site',
+    livePreview: {
+      url: generateGlobalPreviewPath('footer'),
+    },
+    preview: () => generateGlobalPreviewPath('footer'),
   },
   fields: [
     // ── Brand Column ──
@@ -231,7 +243,7 @@ export const Footer: GlobalConfig = {
             {
               name: 'bottomNote',
               type: 'text',
-              defaultValue: 'v1.3 · printed when you ordered it · colophon set in Inter / JetBrains Mono',
+              defaultValue: 'printed when you ordered it',
             },
           ],
         },

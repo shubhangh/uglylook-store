@@ -1,0 +1,85 @@
+.media-preview {
+  margin-bottom: 20px;
+
+  &__label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--theme-elevation-500);
+    margin-bottom: 8px;
+  }
+
+  &__image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #111;
+    border: 1px solid var(--theme-elevation-200);
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__loading {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--theme-elevation-50);
+    border-radius: 6px;
+    color: var(--theme-elevation-400);
+    font-size: 13px;
+  }
+
+  &__hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--theme-elevation-400);
+    margin-top: 6px;
+  }
+}
+
+// Lightbox — needs very high z-index to sit above Payload's toolbar, meta bar, modals
+.media-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  // Isolate stacking context so nothing bleeds through
+  isolation: isolate;
+
+  &__close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-size: 36px;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+    z-index: 1;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__image {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    cursor: default;
+  }
+}

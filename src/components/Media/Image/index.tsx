@@ -49,9 +49,8 @@ export const Image: React.FC<MediaProps> = (props) => {
 
     const filename = fullFilename
 
-    // Fix Payload media URL: /api/media/file/x.png -> /media/x.png
-    const fixedUrl = url?.replace('/api/media/file/', '/media/') ?? url
-    src = fixedUrl ?? ''
+    // Use the url from Payload (R2 URL when cloud storage enabled, local path otherwise)
+    src = url ?? ''
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes

@@ -6,7 +6,9 @@ import { cn } from '@/utilities/cn'
 import { useSelectedLayoutSegments } from 'next/navigation'
 import { PayloadAdminBar } from '@payloadcms/admin-bar'
 import React, { useState } from 'react'
-import { User } from '@/payload-types'
+import type { Team } from '@/payload-types'
+
+type User = Team
 
 const collectionLabels = {
   pages: {
@@ -36,7 +38,8 @@ export const AdminBar: React.FC<{
   const collection = collectionLabels?.[segments?.[1]] ? segments?.[1] : 'pages'
 
   const onAuthChange = React.useCallback((user: User) => {
-    const canSeeAdmin = user?.roles && Array.isArray(user?.roles) && user?.roles?.includes('admin')
+    const u = user as any
+    const canSeeAdmin = u?.role && ['owner', 'admin', 'manager', 'editor'].includes(u.role)
 
     setShow(Boolean(canSeeAdmin))
   }, [])
@@ -51,6 +54,7 @@ export const AdminBar: React.FC<{
       <div className="container">
         <PayloadAdminBar
           {...adminBarProps}
+          authCollectionSlug="team"
           className="py-2 text-white"
           classNames={{
             controls: 'font-medium text-white',

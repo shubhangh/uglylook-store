@@ -18,13 +18,17 @@ export function SimulatedCheckout() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
   const [errors, setErrors] = useState<Record<string, boolean>>({})
+  const [orderError, setOrderError] = useState('')
 
   const [shipping, setShipping] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     address: '',
     city: '',
+    state: '',
     zip: '',
-    country: '',
+    country: 'US',
+    phone: '',
     email: user?.email || '',
   })
 
@@ -40,10 +44,10 @@ export function SimulatedCheckout() {
           Got it.
         </h1>
         <p className="text-lg text-muted-foreground mb-2">
-          Order <span className="font-mono text-foreground">{orderNumber}</span>
+          Order <span className="font-mono text-foreground text-sm">{orderNumber}</span>
         </p>
         <p className="text-muted-foreground mb-8">
-          We&rsquo;ll send a confirmation to <span className="text-foreground">{shipping.email}</span>.
+          We&rsquo;ll send a confirmation to <span className="text-foreground">{shipping.email || user?.email}</span>.
         </p>
 
         <div className="bg-card rounded-lg border border-border p-6 text-left mb-8 space-y-4">
@@ -92,7 +96,7 @@ export function SimulatedCheckout() {
   }
 
   const validateForm = () => {
-    const required = ['name', 'address', 'city', 'zip', 'country', 'email']
+    const required = ['firstName', 'lastName', 'address', 'city', 'state', 'zip', 'email']
     const newErrors: Record<string, boolean> = {}
     let valid = true
     for (const field of required) {
@@ -105,17 +109,61 @@ export function SimulatedCheckout() {
     return valid
   }
 
+  // Auto-lookup city from ZIP code (US only)
+  const lookupCity = async (zip: string) => {
+    if (shipping.country !== 'US' || zip.length < 5) return
+    try {
+      const res = await fetch(`https://api.zippopotam.us/us/${zip}`)
+      if (res.ok) {
+        const data = await res.json()
+        const place = data.places?.[0]
+        if (place) {
+          setShipping((prev) => ({
+            ...prev,
+            city: place['place name'] || prev.city,
+            state: place['state abbreviation'] || prev.state,
+          }))
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
   const handlePlaceOrder = async () => {
     if (!validateForm()) return
     setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    const now = new Date()
-    const dateStr = `${now.getFullYear().toString().slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`
-    const rand = Math.random().toString(36).substring(2, 6).toUpperCase()
-    const num = `UL-${dateStr}-${rand}`
-    setOrderNumber(num)
-    clearCart()
-    setStep('done')
+    setOrderError('')
+
+    try {
+      const res = await fetch('/next/place-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          cartId: (cart as any)?.id || null,
+          items: cart?.items?.map((item: any) => ({
+            product: typeof item.product === 'object' ? item.product.id : item.product,
+            variant: item.variant ? (typeof item.variant === 'object' ? item.variant.id : item.variant) : null,
+            quantity: item.quantity || 1,
+          })),
+          shipping,
+          email: shipping.email,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setOrderError(data.error || 'Something went wrong. Try again.')
+        setIsProcessing(false)
+        return
+      }
+
+      setOrderNumber(data.orderId)
+      clearCart()
+      setStep('done')
+    } catch {
+      setOrderError('Connection failed. Try again.')
+    }
     setIsProcessing(false)
   }
 
@@ -170,31 +218,119 @@ export function SimulatedCheckout() {
             02. Shipping
           </h2>
           <div className="bg-card rounded-lg p-5 border border-border space-y-4">
-            {[
-              { key: 'name', label: 'Full name', placeholder: 'your name' },
-              { key: 'address', label: 'Address', placeholder: 'street address' },
-              { key: 'city', label: 'City', placeholder: 'city' },
-              { key: 'zip', label: 'ZIP / Postal', placeholder: 'zip code' },
-              { key: 'country', label: 'Country', placeholder: 'country' },
-            ].map((field) => (
-              <div key={field.key}>
+            {/* Country — US only */}
+            <div>
+              <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                Country
+              </label>
+              <div className="border-b border-input py-2 text-sm text-foreground">
+                United States
+              </div>
+            </div>
+
+            {/* Name row */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { key: 'firstName', label: 'First name', placeholder: 'first name', autoComplete: 'given-name' },
+                { key: 'lastName', label: 'Last name', placeholder: 'last name', autoComplete: 'family-name' },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                    {field.label}
+                  </label>
+                  <input
+                    type="text"
+                    autoComplete={field.autoComplete}
+                    value={shipping[field.key as keyof typeof shipping]}
+                    onChange={(e) => setShipping({ ...shipping, [field.key]: e.target.value })}
+                    placeholder={field.placeholder}
+                    className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors[field.key] ? 'border-red-500' : 'border-input'}`}
+                  />
+                  {errors[field.key] && <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>}
+                </div>
+              ))}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                Phone
+              </label>
+              <input
+                type="tel"
+                autoComplete="tel"
+                value={shipping.phone}
+                onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
+                placeholder="phone number"
+                className="w-full bg-transparent border-b border-input py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors"
+              />
+            </div>
+
+            {/* Address */}
+            <div>
+              <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                Address
+              </label>
+              <input
+                type="text"
+                autoComplete="address-line1"
+                value={shipping.address}
+                onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
+                placeholder="street address"
+                className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors.address ? 'border-red-500' : 'border-input'}`}
+              />
+              {errors.address && <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>}
+            </div>
+
+            {/* ZIP → City + State row */}
+            <div className="grid grid-cols-[120px_1fr_100px] gap-4">
+              <div>
                 <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
-                  {field.label}
+                  ZIP
                 </label>
                 <input
                   type="text"
-                  value={shipping[field.key as keyof typeof shipping]}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, [field.key]: e.target.value })
-                  }
-                  placeholder={field.placeholder}
-                  className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors[field.key] ? 'border-red-500' : 'border-input'}`}
+                  autoComplete="postal-code"
+                  value={shipping.zip}
+                  onChange={(e) => {
+                    const zip = e.target.value
+                    setShipping({ ...shipping, zip })
+                    if (zip.length >= 5) lookupCity(zip)
+                  }}
+                  placeholder="zip"
+                  className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors.zip ? 'border-red-500' : 'border-input'}`}
                 />
-                {errors[field.key] && (
-                  <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>
-                )}
+                {errors.zip && <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>}
               </div>
-            ))}
+              <div>
+                <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                  City
+                </label>
+                <input
+                  type="text"
+                  autoComplete="address-level2"
+                  value={shipping.city}
+                  onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
+                  placeholder="city"
+                  className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors.city ? 'border-red-500' : 'border-input'}`}
+                />
+                {errors.city && <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>}
+              </div>
+              <div>
+                <label className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground block mb-2">
+                  State
+                </label>
+                <input
+                  type="text"
+                  autoComplete="address-level1"
+                  value={shipping.state}
+                  onChange={(e) => setShipping({ ...shipping, state: e.target.value })}
+                  placeholder="state"
+                  className={`w-full bg-transparent border-b py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-olive transition-colors ${errors.state ? 'border-red-500' : 'border-input'}`}
+                />
+                {errors.state && <p className="mt-1 font-mono text-[10px] text-red-500">Required</p>}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -214,6 +350,11 @@ export function SimulatedCheckout() {
             <p className="text-sm text-muted-foreground mb-6">
               Payment is simulated. Click below to complete the order.
             </p>
+            {orderError && (
+              <div className="mb-4 p-3 rounded-md bg-red-500/10 border border-red-500/20">
+                <p className="text-sm text-red-400">{orderError}</p>
+              </div>
+            )}
             {isProcessing && (
               <div className="mb-4 h-1 w-full rounded-full bg-muted overflow-hidden">
                 <div className="h-full bg-olive animate-pulse rounded-full" style={{ width: '100%', animation: 'pulse 1s ease-in-out infinite' }} />

@@ -1,13 +1,45 @@
 'use client'
 
 import { useState } from 'react'
+import { useLivePreview } from '@payloadcms/live-preview-react'
+import { getClientSideURL } from '@/utilities/getURL'
 import type { ContactPage } from '@/payload-types'
 
-export default function ContactClient({ data }: { data: ContactPage }) {
+function validateField(name: string, value: string): string {
+  const v = value.trim()
+  if (name === 'name' && !v) return 'Name is required'
+  if (name === 'email' && !v) return 'Email is required'
+  if (name === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Enter a valid email'
+  if (name === 'message' && !v) return 'Message is required'
+  return ''
+}
+
+export function ContactClient({ data: initialData }: { data: ContactPage }) {
+  const { data } = useLivePreview<ContactPage>({
+    initialData,
+    serverURL: getClientSideURL(),
+    depth: 1,
+  })
   const [submitted, setSubmitted] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    const error = validateField(name, value)
+    setErrors((prev) => ({ ...prev, [name]: error }))
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+    const newErrors: Record<string, string> = {}
+    for (const [name, value] of formData.entries()) {
+      const error = validateField(name, value as string)
+      if (error) newErrors[name] = error
+    }
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length > 0) return
     setSubmitted(true)
   }
 
@@ -91,9 +123,11 @@ export default function ContactClient({ data }: { data: ContactPage }) {
                   name="name"
                   type="text"
                   required
-                  className="w-full rounded-none border-0 border-b border-input bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:border-olive focus:outline-none transition-colors"
+                  onBlur={handleBlur}
+                  className={`w-full rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.name ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.namePlaceholder || 'your name'}
                 />
+                {errors.name && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.name}</p>}
               </div>
 
               <div>
@@ -108,9 +142,11 @@ export default function ContactClient({ data }: { data: ContactPage }) {
                   name="email"
                   type="email"
                   required
-                  className="w-full rounded-none border-0 border-b border-input bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:border-olive focus:outline-none transition-colors"
+                  onBlur={handleBlur}
+                  className={`w-full rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.emailPlaceholder || 'you@somewhere.com'}
                 />
+                {errors.email && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.email}</p>}
               </div>
 
               <div>
@@ -141,9 +177,11 @@ export default function ContactClient({ data }: { data: ContactPage }) {
                   name="message"
                   required
                   rows={5}
-                  className="w-full resize-none rounded-none border-0 border-b border-input bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:border-olive focus:outline-none transition-colors"
+                  onBlur={handleBlur}
+                  className={`w-full resize-none rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.message ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.messagePlaceholder || 'keep it short or don\'t. we\'ll read it either way.'}
                 />
+                {errors.message && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.message}</p>}
               </div>
 
               <button

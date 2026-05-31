@@ -34,6 +34,15 @@ const nextConfig: NextConfig = {
           protocol: url.protocol.replace(':', '') as 'http' | 'https',
         }
       }),
+      // Cloudflare R2 public URL
+      ...(process.env.R2_PUBLIC_URL
+        ? [
+            {
+              hostname: new URL(process.env.R2_PUBLIC_URL).hostname,
+              protocol: 'https' as const,
+            },
+          ]
+        : []),
     ],
   },
   reactStrictMode: true,
@@ -47,6 +56,7 @@ const nextConfig: NextConfig = {
 
     return webpackConfig
   },
+  serverExternalPackages: ['@resvg/resvg-js'],
   turbopack: {
     root: path.resolve(dirname),
   },

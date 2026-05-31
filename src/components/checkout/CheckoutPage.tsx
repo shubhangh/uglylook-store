@@ -25,6 +25,8 @@ import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { Check } from 'lucide-react'
+import { cn } from '@/utilities/cn'
 
 const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
 const stripe = loadStripe(apiKey)
@@ -39,6 +41,7 @@ export const CheckoutPage: React.FC = () => {
    * State to manage the email input for guest checkout.
    */
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
   const [paymentData, setPaymentData] = useState<null | Record<string, unknown>>(null)
   const { initiatePayment } = usePayments()
@@ -127,9 +130,12 @@ export const CheckoutPage: React.FC = () => {
     )
   }
 
+  const currentStep: 1 | 2 = paymentData ? 2 : 1
+
   return (
     <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
       <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
+        <CheckoutSteps current={currentStep} />
         <h2 className="font-medium text-3xl">Contact</h2>
         {!user && (
           <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
@@ -167,10 +173,21 @@ export const CheckoutPage: React.FC = () => {
                   disabled={!emailEditable}
                   id="email"
                   name="email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (emailError) setEmailError('')
+                  }}
+                  onBlur={(e) => {
+                    const v = e.target.value.trim()
+                    if (!v) setEmailError('Email is required')
+                    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) setEmailError('Enter a valid email')
+                    else setEmailError('')
+                  }}
                   required
                   type="email"
+                  className={emailError ? 'border-destructive' : ''}
                 />
+                {emailError && <p className="mt-1.5 font-mono text-[10px] text-destructive">{emailError}</p>}
               </FormItem>
 
               <Button
@@ -435,6 +452,46 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function CheckoutSteps({ current }: { current: 1 | 2 }) {
+  const steps = ['Address', 'Payment']
+  return (
+    <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-widest">
+      {steps.map((step, i) => {
+        const stepNum = (i + 1) as 1 | 2
+        const isCompleted = stepNum < current
+        const isActive = stepNum === current
+        return (
+          <React.Fragment key={step}>
+            {i > 0 && <span className="w-8 h-px bg-border" />}
+            <span
+              className={cn(
+                'flex items-center gap-2',
+                isActive && 'text-olive-text',
+                isCompleted && 'text-foreground',
+                !isActive && !isCompleted && 'text-muted-foreground',
+              )}
+            >
+              {isCompleted ? (
+                <Check size={14} className="text-olive-text" />
+              ) : (
+                <span
+                  className={cn(
+                    'w-5 h-5 rounded-full border flex items-center justify-center text-[10px]',
+                    isActive ? 'border-primary text-olive-text' : 'border-border',
+                  )}
+                >
+                  {stepNum}
+                </span>
+              )}
+              {step}
+            </span>
+          </React.Fragment>
+        )
+      })}
     </div>
   )
 }

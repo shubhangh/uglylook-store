@@ -44,9 +44,25 @@ export const StockIndicator: React.FC<Props> = ({ product }) => {
   }
 
   return (
-    <div className="uppercase font-mono text-sm font-medium text-gray-500">
-      {stockQuantity < 10 && stockQuantity > 0 && <p>Only {stockQuantity} left in stock</p>}
-      {(stockQuantity === 0 || !stockQuantity) && <p>Out of stock</p>}
+    <div className="font-mono text-[11px] uppercase tracking-widest">
+      {stockQuantity > 5 && (
+        <span className="inline-flex items-center gap-1.5 bg-primary/10 text-olive-text px-3 py-1.5 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          In stock
+        </span>
+      )}
+      {stockQuantity > 0 && stockQuantity <= 5 && (
+        <span className="inline-flex items-center gap-1.5 bg-destructive/10 text-destructive px-3 py-1.5 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+          Only {stockQuantity} left
+        </span>
+      )}
+      {(stockQuantity === 0 || !stockQuantity) && (
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+          Out of stock
+        </span>
+      )}
     </div>
   )
 }

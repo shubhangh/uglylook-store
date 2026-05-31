@@ -1,13 +1,15 @@
 import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { ScrollFadeIn } from '@/components/ScrollFadeIn'
+import { ShopControls } from '@/components/shop/ShopControls'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
 export const metadata = {
-  description: 'Search for products in the store.',
   title: 'Shop',
+  description:
+    'Browse the full UglyLook catalog. Tees, hoodies, hats and objects. 240gsm cotton, boxy fit, DTG printed.',
 }
 
 type SearchParams = { [key: string]: string | string[] | undefined }
@@ -19,6 +21,13 @@ type Props = {
 export default async function ShopPage({ searchParams }: Props) {
   const { q: searchValue, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
+
+  const categories = await payload.find({
+    collection: 'categories',
+    limit: 20,
+    sort: 'title',
+    where: { showOnStorefront: { equals: true } },
+  })
 
   const products = await payload.find({
     collection: 'products',
@@ -78,6 +87,8 @@ export default async function ShopPage({ searchParams }: Props) {
 
   return (
     <div>
+      <ShopControls categories={categories.docs} />
+
       {searchValue ? (
         <p className="mb-6 text-sm text-muted-foreground">
           {products.docs?.length === 0 ? (
@@ -105,11 +116,11 @@ export default async function ShopPage({ searchParams }: Props) {
       )}
 
       {products?.docs.length > 0 ? (
-        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.docs.map((product, i) => {
             return (
               <ScrollFadeIn key={product.id} delay={i * 60}>
-                <ProductGridItem product={product} />
+                <ProductGridItem product={product} priority={i < 4} />
               </ScrollFadeIn>
             )
           })}

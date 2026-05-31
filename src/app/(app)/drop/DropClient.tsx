@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLivePreview } from '@payloadcms/live-preview-react'
+import { getClientSideURL } from '@/utilities/getURL'
 import type { DropPage } from '@/payload-types'
 
 interface TimeLeft {
@@ -16,7 +18,13 @@ function pad(n: number): string {
 
 const INITIAL_TIME: TimeLeft = { days: 0, hours: 0, min: 0, sec: 0 }
 
-export default function DropClient({ data }: { data: DropPage }) {
+export function DropClient({ data: initialData }: { data: DropPage }) {
+  const { data } = useLivePreview<DropPage>({
+    initialData,
+    serverURL: getClientSideURL(),
+    depth: 1,
+  })
+
   const targetDate = data.targetDate || '2027-01-14T14:00:00Z'
 
   function calcTimeLeft(): TimeLeft {

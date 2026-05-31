@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
+import { getVariantColor } from '@/utilities/variantColors'
 import clsx from 'clsx'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
@@ -30,6 +31,8 @@ export function VariantSelector({ product }: { product: Product }) {
     if (!options || !Array.isArray(options) || !options.length) {
       return <></>
     }
+
+    const isColorType = type.name?.toLowerCase().includes('color') || type.label?.toLowerCase().includes('color')
 
     return (
       <dl className="" key={type.id}>
@@ -93,6 +96,29 @@ export function VariantSelector({ product }: { product: Product }) {
               const isActive =
                 Boolean(isAvailableForSale) &&
                 searchParams.get(optionKeyLowerCase) === String(optionID)
+
+              const colorHex = isColorType ? getVariantColor(option.label) : null
+
+              if (isColorType && colorHex) {
+                return (
+                  <button
+                    key={option.id}
+                    aria-disabled={!isAvailableForSale}
+                    aria-label={`${option.label}${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                    className={clsx(
+                      'w-8 h-8 rounded-full border-2 transition-all duration-200 cursor-pointer',
+                      isActive
+                        ? 'border-foreground ring-2 ring-foreground ring-offset-2 ring-offset-background'
+                        : 'border-border hover:border-foreground/50',
+                      !isAvailableForSale && 'opacity-30 cursor-not-allowed',
+                    )}
+                    disabled={!isAvailableForSale}
+                    style={{ backgroundColor: colorHex }}
+                    onClick={() => router.replace(optionUrl, { scroll: false })}
+                    title={`${option.label}${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                  />
+                )
+              }
 
               return (
                 <Button

@@ -1,6 +1,10 @@
 import type { CollectionConfig } from 'payload'
-import { adminOnly } from '@/access/adminOnly'
+import { contentAccess, contentDeleteAccess } from '@/access/utilities'
 import { publicAccess } from '@/access/publicAccess'
+import { generatePreviewPath } from '@/utilities/generatePreviewPath'
+import { approvalFields } from '@/fields/approvalFields'
+import { approvalWorkflow } from '@/hooks/approvalWorkflow'
+import { revalidatePost, revalidateDeletePost } from './hooks/revalidatePost'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -9,14 +13,33 @@ export const Posts: CollectionConfig = {
     plural: 'Reads / Blog Posts',
   },
   access: {
-    create: adminOnly,
-    delete: adminOnly,
+    create: contentAccess,
+    delete: contentDeleteAccess,
     read: publicAccess,
-    update: adminOnly,
+    update: contentAccess,
+  },
+  hooks: {
+    beforeChange: [approvalWorkflow],
+    afterChange: [revalidatePost],
+    afterDelete: [revalidateDeletePost],
   },
   admin: {
     group: 'Content',
     defaultColumns: ['title', 'category', 'status', 'publishedAt'],
+    livePreview: {
+      url: ({ data, req }) =>
+        generatePreviewPath({
+          slug: data?.slug,
+          collection: 'posts',
+          req,
+        }),
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        slug: data?.slug as string,
+        collection: 'posts',
+        req,
+      }),
     useAsTitle: 'title',
   },
   fields: [
@@ -92,5 +115,6 @@ export const Posts: CollectionConfig = {
         },
       },
     },
+    ...approvalFields,
   ],
 }

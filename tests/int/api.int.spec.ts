@@ -11,10 +11,10 @@ describe('API', () => {
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('fetches users', async () => {
-    const users = await payload.find({
-      collection: 'users',
+  it('fetches team', async () => {
+    const team = await payload.find({
+      collection: 'team',
     })
-    expect(users).toBeDefined()
+    expect(team).toBeDefined()
   })
 })

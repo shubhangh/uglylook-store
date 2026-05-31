@@ -135,6 +135,8 @@
 
 .colLink:hover {
   color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 /* ---- Bottom Bar ---- */

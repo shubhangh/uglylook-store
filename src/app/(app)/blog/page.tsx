@@ -4,7 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 export const metadata = {
-  title: 'Reads | UglyLook',
+  title: 'Reads',
   description: 'Stories, drops, and culture from UglyLook.',
 }
 

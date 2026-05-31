@@ -1,5 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
+import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
+import { revalidateGlobal } from './hooks/revalidateGlobal'
 
 export const HomepageConfig: GlobalConfig = {
   slug: 'homepage',
@@ -7,6 +9,20 @@ export const HomepageConfig: GlobalConfig = {
   access: {
     read: () => true,
     update: adminOnly,
+  },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: {
+      url: generateGlobalPreviewPath('homepage'),
+    },
+    preview: () => generateGlobalPreviewPath('homepage'),
   },
   fields: [
     // ── Metadata ──
@@ -17,6 +33,7 @@ export const HomepageConfig: GlobalConfig = {
       fields: [
         { name: 'metaTitle', type: 'text', defaultValue: 'UglyLook — Ugly is the new sick.' },
         { name: 'metaDescription', type: 'textarea', defaultValue: 'Tees, hoodies and objects too loud for the For You page. 240gsm cotton, boxy fit, dry copy, printed when you order.' },
+        { name: 'metaImage', type: 'upload', relationTo: 'media', admin: { description: 'Social sharing image (1200×630 recommended).' } },
       ],
     },
 
@@ -37,9 +54,9 @@ export const HomepageConfig: GlobalConfig = {
       admin: { initCollapsed: false },
       fields: [
         { name: 'showHero', type: 'checkbox', defaultValue: true, label: 'Show hero section on site' },
-        { name: 'heroStamp', type: 'text', defaultValue: 'SS27 · QUIET BUILD' },
+        { name: 'heroStamp', type: 'text', defaultValue: 'SS27 \u00B7 QUIET BUILD' },
         { name: 'heroClock', type: 'text', defaultValue: '23:14 UTC' },
-        { name: 'heroFileLabel', type: 'text', defaultValue: 'FILE / 01 — LANDING' },
+        { name: 'heroFileLabel', type: 'text', defaultValue: 'FILE / 01 \u2014 LANDING' },
         { name: 'heroLine1', type: 'text', defaultValue: 'Good is over.', label: 'Headline line 1' },
         { name: 'heroLine2', type: 'text', defaultValue: 'Ugly is the new', label: 'Headline line 2' },
         { name: 'heroLine3', type: 'text', defaultValue: 'sick.', label: 'Headline line 3' },
@@ -100,7 +117,7 @@ export const HomepageConfig: GlobalConfig = {
         { name: 'pullQuoteMetaLeft', type: 'text', defaultValue: 'FN.01' },
         { name: 'pullQuoteText', type: 'text', defaultValue: 'Coolness is always the inversion of an insult.' },
         { name: 'pullQuoteEmWord', type: 'text', defaultValue: 'inversion', label: 'Emphasized word (italic)' },
-        { name: 'pullQuoteMetaRight', type: 'text', defaultValue: 'UL · v1.3' },
+        { name: 'pullQuoteMetaRight', type: 'text', defaultValue: 'UL · SS27' },
       ],
     },
 

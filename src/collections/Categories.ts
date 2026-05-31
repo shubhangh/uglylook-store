@@ -24,5 +24,14 @@ export const Categories: CollectionConfig = {
     slugField({
       position: undefined,
     }),
+    {
+      name: 'showOnStorefront',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+        description: 'When off, this category is hidden from the shop, navigation, and sitemap. Use for internal categories like logos or design assets.',
+      },
+    },
   ],
 }

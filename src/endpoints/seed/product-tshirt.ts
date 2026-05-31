@@ -25,7 +25,7 @@ export const productTshirtData: (
     variantTypes: variantTypes,
     inventory: 0,
     meta: {
-      title: 'Tshirt | Payload Ecommerce Template',
+      title: 'Tee | UglyLook',
       image: metaImage,
       description:
         'Top off your look with our classic Tshirt, crafted for style and comfort. Made with breathable, high-quality materials and an adjustable strap for the perfect fit.',
@@ -53,7 +53,7 @@ export const productTshirtData: (
                             format: 0,
                             mode: 'normal',
                             style: '',
-                            text: 'This is 100% cotton unisex fitted tee with screen printed design. Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document',
+                            text: '100% ringspun cotton unisex tee. 240gsm. Boxy fit, dropped shoulder. DTG printed. Cold wash, hang dry, iron inside out.',
                             type: 'text',
                             version: 1,
                           },

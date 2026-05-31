@@ -22,7 +22,10 @@ export const Video: React.FC<MediaProps> = (props) => {
   }, [])
 
   if (resource && typeof resource === 'object') {
-    const { filename } = resource
+    const { filename, url } = resource
+
+    // Use R2 URL when available, fall back to local path
+    const videoSrc = url ?? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${filename}`
 
     return (
       <video
@@ -35,7 +38,7 @@ export const Video: React.FC<MediaProps> = (props) => {
         playsInline
         ref={videoRef}
       >
-        <source src={`${process.env.NEXT_PUBLIC_SERVER_URL}/media/${filename}`} />
+        <source src={videoSrc} />
       </video>
     )
   }

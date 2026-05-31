@@ -7,12 +7,18 @@ export function NewsletterCTA() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setEmail('')
-    }
+    if (!email) return
+    try {
+      await fetch('/next/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'newsletter-cta' }),
+      })
+    } catch { /* ignore */ }
+    setSubscribed(true)
+    setEmail('')
   }
 
   return (
@@ -54,14 +60,33 @@ export function NewsletterCTA() {
 
         <div className={styles.decorative} aria-hidden="true">
           <div className={styles.silhouette}>
-            <svg viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.tee}>
-              <path d="M60 0 L0 40 L20 60 L40 50 L40 280 L160 280 L160 50 L180 60 L200 40 L140 0 Z" fill="currentColor" />
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.shape1}>
+              {/* Starburst: 12 radiating lines + 2 concentric circles */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30 * Math.PI) / 180
+                return (
+                  <line
+                    key={i}
+                    x1={100 + 30 * Math.cos(angle)}
+                    y1={100 + 30 * Math.sin(angle)}
+                    x2={100 + 95 * Math.cos(angle)}
+                    y2={100 + 95 * Math.sin(angle)}
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                )
+              })}
+              <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="1.5" fill="none" />
+              <circle cx="100" cy="100" r="70" stroke="currentColor" strokeWidth="1" fill="none" />
             </svg>
           </div>
           <div className={styles.silhouette2}>
-            <svg viewBox="0 0 200 320" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.hoodie}>
-              <path d="M70 0 L60 20 Q80 30 100 30 Q120 30 140 20 L130 0 Z" fill="currentColor" />
-              <path d="M60 20 L0 60 L20 80 L40 70 L40 320 L160 320 L160 70 L180 80 L200 60 L140 20 Z" fill="currentColor" />
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.shape2}>
+              {/* Concentric offset rings */}
+              <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="1.5" fill="none" />
+              <circle cx="105" cy="95" r="65" stroke="currentColor" strokeWidth="1.5" fill="none" />
+              <circle cx="110" cy="90" r="40" stroke="currentColor" strokeWidth="1" fill="none" />
+              <circle cx="115" cy="85" r="15" stroke="currentColor" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>

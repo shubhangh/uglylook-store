@@ -38,7 +38,7 @@ export const CreateAccountForm: React.FC = () => {
 
   const onSubmit = useCallback(
     async (data: FormData) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/customers`, {
         body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const CreateAccountForm: React.FC = () => {
       <div className="prose dark:prose-invert mb-6">
         <p>
           {`This is where new customers can signup and create a new account. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
+          <Link href="/adm/collections/customers">login to the admin dashboard</Link>.
         </p>
       </div>
 

@@ -14,7 +14,7 @@ export function OpenCartButton({
       aria-label={`Shopping bag, ${quantity || 0} items`}
       {...rest}
     >
-      Bag ({quantity || 0})
+      Bag (<span key={quantity} className="inline-block animate-cart-bump">{quantity || 0}</span>)
     </button>
   )
 }

@@ -4,6 +4,8 @@ import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { slugField } from 'payload'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
+import { approvalFields } from '@/fields/approvalFields'
+import { approvalWorkflow } from '@/hooks/approvalWorkflow'
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -19,9 +21,44 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 import { DefaultDocumentIDType, Where } from 'payload'
+import { isAtLeastManager, isTeamMember } from '@/access/utilities'
+import { revalidateProduct, revalidateDeleteProduct } from './hooks/revalidateProduct'
+import { syncDesignToProduct } from './hooks/syncDesignToProduct'
+import { updateDesignUsageAfterChange, updateDesignUsageAfterDelete } from './hooks/updateDesignUsage'
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
+  access: {
+    ...defaultCollection?.access,
+    // Manager: CRU (no delete). Editor: read-only (via adminOrPublishedStatus which includes isTeamMember).
+    create: ({ req: { user } }) => isAtLeastManager(user),
+    update: ({ req: { user } }) => isAtLeastManager(user),
+    // read: kept from default (adminOrPublishedStatus — team sees all, public sees published)
+    // delete: kept from default (isAdmin = owner/admin only)
+    // Editor read-only: add editor to read access
+    read: ({ req: { user } }) => {
+      if (isTeamMember(user)) return true
+      return { _status: { equals: 'published' } }
+    },
+  },
+  hooks: {
+    ...defaultCollection?.hooks,
+    beforeChange: [
+      ...(defaultCollection?.hooks?.beforeChange || []),
+      approvalWorkflow,
+      syncDesignToProduct,
+    ],
+    afterChange: [
+      ...(defaultCollection?.hooks?.afterChange || []),
+      revalidateProduct,
+      updateDesignUsageAfterChange,
+    ],
+    afterDelete: [
+      ...(defaultCollection?.hooks?.afterDelete || []),
+      revalidateDeleteProduct,
+      updateDesignUsageAfterDelete,
+    ],
+  },
   admin: {
     ...defaultCollection?.admin,
     defaultColumns: ['title', 'enableVariants', '_status', 'variants.variants'],
@@ -207,6 +244,45 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       hasMany: true,
       relationTo: 'categories',
     },
+    {
+      name: 'buckets',
+      type: 'relationship',
+      relationTo: 'buckets',
+      hasMany: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Admin-only grouping. Not visible to customers.',
+      },
+    },
     slugField(),
+    ...approvalFields,
+    // ── Design Link ──
+    {
+      name: 'design',
+      type: 'relationship',
+      relationTo: 'designs',
+      admin: {
+        position: 'sidebar',
+        description: 'Linked design from the Design Library. Auto-populates printFile and designUrl.',
+      },
+    },
+    // ── Printify Fulfillment ──
+    {
+      name: 'printFile',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        position: 'sidebar',
+        description: 'Print-ready design file (PNG, transparent bg). Sent to Printify for printing.',
+      },
+    },
+    {
+      name: 'printifyConfig',
+      type: 'json',
+      admin: {
+        position: 'sidebar',
+        description: 'Printify fulfillment config: blueprintId, providerId, designUrl, placement, variantMap. Auto-populated by Product Launcher or set manually.',
+      },
+    },
   ],
 })

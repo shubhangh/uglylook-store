@@ -20,7 +20,12 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
   const categories = await payload.find({
     collection: 'categories',
-    where: { slug: { equals: categorySlug } },
+    where: {
+      and: [
+        { slug: { equals: categorySlug } },
+        { showOnStorefront: { equals: true } },
+      ],
+    },
     limit: 1,
   })
 
@@ -38,6 +43,7 @@ export async function generateStaticParams() {
   const categories = await payload.find({
     collection: 'categories',
     limit: 100,
+    where: { showOnStorefront: { equals: true } },
   })
 
   return categories.docs.map((cat) => ({
@@ -50,10 +56,15 @@ export default async function CategoryPage({ params, searchParams }: Args) {
   const { sort } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
-  // Find the category by slug
+  // Find the category by slug — only storefront categories
   const categories = await payload.find({
     collection: 'categories',
-    where: { slug: { equals: categorySlug } },
+    where: {
+      and: [
+        { slug: { equals: categorySlug } },
+        { showOnStorefront: { equals: true } },
+      ],
+    },
     limit: 1,
   })
 
@@ -111,10 +122,10 @@ export default async function CategoryPage({ params, searchParams }: Args) {
       )}
 
       {products.docs.length > 0 && (
-        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.docs.map((product, i) => (
             <ScrollFadeIn key={product.id} delay={i * 60}>
-              <ProductGridItem product={product} />
+              <ProductGridItem product={product} priority={i < 4} />
             </ScrollFadeIn>
           ))}
         </Grid>

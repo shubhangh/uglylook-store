@@ -83,6 +83,10 @@ export default async function Order({ params, searchParams }: PageProps) {
         createdAt: true,
         updatedAt: true,
         shippingAddress: true,
+        fulfillmentStatus: true,
+        trackingNumber: true,
+        trackingCarrier: true,
+        trackingUrl: true,
       },
     })
 
@@ -152,10 +156,48 @@ export default async function Order({ params, searchParams }: PageProps) {
           {order.status && (
             <div className="grow max-w-1/3">
               <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Status</p>
-              <OrderStatus className="text-sm" status={order.status} />
+              <OrderStatus className="text-sm" status={order.status} fulfillmentStatus={(order as any).fulfillmentStatus} />
             </div>
           )}
         </div>
+
+        {(order as any).fulfillmentStatus && (
+          <div>
+            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Fulfillment</h2>
+            <div className="flex flex-col gap-3 lg:flex-row lg:gap-8">
+              <div>
+                <p className="text-xs text-primary/40 font-mono uppercase">Status</p>
+                <p className="text-sm font-mono uppercase">
+                  {(order as any).fulfillmentStatus?.replace(/_/g, ' ')}
+                </p>
+              </div>
+              {(order as any).trackingNumber && (
+                <div>
+                  <p className="text-xs text-primary/40 font-mono uppercase">Tracking</p>
+                  <p className="text-sm">
+                    {(order as any).trackingCarrier && (
+                      <span className="font-mono uppercase mr-2">
+                        {(order as any).trackingCarrier}
+                      </span>
+                    )}
+                    {(order as any).trackingUrl ? (
+                      <a
+                        href={(order as any).trackingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-foreground"
+                      >
+                        {(order as any).trackingNumber}
+                      </a>
+                    ) : (
+                      <span>{(order as any).trackingNumber}</span>
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {order.items && (
           <div>

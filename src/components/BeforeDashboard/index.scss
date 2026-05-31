@@ -41,4 +41,15 @@
       }
     }
   }
+
+  &__link--highlight {
+    background-color: #5A6242 !important;
+    border-color: #5A6242 !important;
+    color: #f5f2ec !important;
+
+    &:hover {
+      background-color: #6b7350 !important;
+      border-color: #6b7350 !important;
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { SeedButton } from './SeedButton'
+import { PendingReviews } from '@/components/approval/PendingReviews'
 import './index.scss'
 
 const baseClass = 'before-dashboard'
@@ -15,13 +16,18 @@ export const BeforeDashboard: React.FC = () => {
         <a href="/adm/collections/products">Products</a>
         <a href="/adm/collections/orders">Orders</a>
         <a href="/adm/collections/categories">Categories</a>
-        <a href="/adm/collections/users">Customers</a>
+        <a href="/adm/collections/customers">Customers</a>
+        <a href="/adm/collections/team">Team</a>
         <a href="/adm/collections/posts">Reads</a>
         <a href="/adm/collections/media">Media</a>
+        <a href="/adm/collections/bulk-uploads">
+          Bulk Upload
+        </a>
         <a href="/" target="_blank" rel="noopener noreferrer">
           View Store
         </a>
       </div>
+      <PendingReviews />
       <SeedButton />
     </div>
   )

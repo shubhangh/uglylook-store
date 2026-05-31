@@ -90,12 +90,46 @@ button[class*='primary'] {
   padding-bottom: 4px !important;
 }
 
+// Active nav item — background highlight
+.nav__link.active {
+  background-color: var(--theme-elevation-100);
+  border-radius: 4px;
+}
+
 [class*='nav-group__toggle'] {
   font-size: 11px !important;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
+
+// Media edit page — wider sidebar for image preview
+.collection-media {
+  .doc-controls__sidebar-wrap {
+    min-width: 380px !important;
+    max-width: 420px !important;
+  }
+}
+
+// Main content area — increase base font size (sidebar excluded)
+.template-default__wrap {
+  font-size: 15px !important;
+
+  label,
+  .field-type {
+    font-size: 14px;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+
+  // Table cells in list views
+  .table .cell-title,
+  .table td {
+    font-size: 14px;
+  }
+}
 
 // Scrollbar styling
 ::-webkit-scrollbar {
@@ -112,6 +146,28 @@ button[class*='primary'] {
   border-radius: 3px;
 }
 
+// Password show/hide toggle
+.pw-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--theme-elevation-500);
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.15s;
+
+  &:hover {
+    color: var(--theme-text);
+    border-color: var(--theme-elevation-400);
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -121,4 +177,19 @@ button[class*='primary'] {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+// Fix bulk edit drawer — center content vertically
+// Only targets edit-many drawers (not side-panel drawers which need the close button as backdrop)
+.drawer:has(.edit-many__main) {
+  .drawer__close {
+    flex-grow: 0 !important;
+    flex: none !important;
+    height: auto !important;
+  }
+
+  .drawer__content {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+  }
 }

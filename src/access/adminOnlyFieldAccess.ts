@@ -1,9 +1,7 @@
 import type { FieldAccess } from 'payload'
+import { isAtLeastManager } from '@/access/utilities'
 
-import { checkRole } from '@/access/utilities'
-
+/** Field-level access for owner, admin, and manager roles. */
 export const adminOnlyFieldAccess: FieldAccess = ({ req: { user } }) => {
-  if (user) return checkRole(['admin'], user)
-
-  return false
+  return isAtLeastManager(user)
 }

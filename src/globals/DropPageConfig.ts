@@ -1,11 +1,33 @@
 import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
+import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
+import { revalidateGlobal } from './hooks/revalidateGlobal'
 
 export const DropPageConfig: GlobalConfig = {
   slug: 'dropPage',
   label: 'Drop Page',
   access: { read: () => true, update: adminOnly },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: { url: generateGlobalPreviewPath('dropPage') },
+    preview: () => generateGlobalPreviewPath('dropPage'),
+  },
   fields: [
+    {
+      type: 'collapsible', label: 'Page Metadata', admin: { initCollapsed: true },
+      fields: [
+        { name: 'metaTitle', type: 'text', defaultValue: 'Next Drop — UglyLook' },
+        { name: 'metaDescription', type: 'textarea', defaultValue: 'The next UglyLook drop. Opens when it opens.' },
+        { name: 'metaImage', type: 'upload', relationTo: 'media', admin: { description: 'Social sharing image (1200×630 recommended).' } },
+      ],
+    },
     {
       type: 'collapsible', label: 'Section Header', admin: { initCollapsed: false },
       fields: [

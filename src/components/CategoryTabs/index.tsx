@@ -10,6 +10,7 @@ async function List() {
   const categoriesData = await payload.find({
     collection: 'categories',
     sort: 'title',
+    where: { showOnStorefront: { equals: true } },
     select: {
       title: true,
       slug: true,

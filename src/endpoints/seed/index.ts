@@ -818,7 +818,7 @@ export const seed = async ({
       showThemeToggle: true,
       themeToggleAlignment: 'center',
       showBottomNote: true,
-      bottomNote: 'v1.3 \u00B7 printed when you ordered it \u00B7 colophon set in Inter / JetBrains Mono',
+      bottomNote: 'printed when you ordered it',
     },
   })
 
@@ -846,11 +846,10 @@ export const seed = async ({
       heroNote: 'no email required \u00B7 no popup \u00B7 ever.',
       showTagCard: true,
       heroTagRows: [
-        { visible: true, label: 'Brand', value: 'UglyLook \u00B7 v1.3', highlight: false },
+        { visible: true, label: 'Brand', value: 'UglyLook', highlight: false },
         { visible: true, label: 'Founded', value: 'Internet, 2026', highlight: false },
         { visible: true, label: 'Catalog', value: '17 SKUs \u00B7 5 lanes', highlight: true },
         { visible: true, label: 'Made', value: 'POD \u00B7 DTG \u00B7 ringspun cotton', highlight: false },
-        { visible: true, label: 'Ships from', value: 'Berlin \u00B7 Riga \u00B7 Charlotte', highlight: false },
         { visible: true, label: 'Filter', value: 'Aggressive', highlight: true },
       ],
       showMarquee: true,
@@ -870,7 +869,7 @@ export const seed = async ({
       pullQuoteMetaLeft: 'FN.01',
       pullQuoteText: 'Coolness is always the inversion of an insult.',
       pullQuoteEmWord: 'inversion',
-      pullQuoteMetaRight: 'UL \u00B7 v1.3',
+      pullQuoteMetaRight: 'UL \u00B7 SS27',
       showManifesto: true,
       manifestoNumber: 'SEC / 03',
       manifestoTitle: 'The thesis.\nIn writing.',
@@ -1117,18 +1116,17 @@ export const seed = async ({
     payload.logger.info('— Seeding sample customer & orders...')
 
     await payload.delete({
-      collection: 'users',
+      collection: 'customers',
       depth: 0,
       where: { email: { equals: 'customer@example.com' } },
     })
 
     const customer = await payload.create({
-      collection: 'users',
+      collection: 'customers',
       data: {
         name: 'Customer',
         email: 'customer@example.com',
         password: 'password',
-        roles: ['customer'],
       },
     })
 

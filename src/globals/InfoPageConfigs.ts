@@ -1,5 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
+import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
+import { revalidateGlobal } from './hooks/revalidateGlobal'
 
 // Helper to create a simple section with numbered paragraphs
 function textSection(name: string, label: string, defaultTitle: string, defaultContent: string) {
@@ -20,12 +22,25 @@ export const ShippingReturnsConfig: GlobalConfig = {
   slug: 'shippingReturnsPage',
   label: 'Shipping & Returns',
   access: { read: () => true, update: adminOnly },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: { url: generateGlobalPreviewPath('shippingReturnsPage') },
+    preview: () => generateGlobalPreviewPath('shippingReturnsPage'),
+  },
   fields: [
     {
       type: 'collapsible', label: 'Page Metadata', admin: { initCollapsed: true },
       fields: [
         { name: 'metaTitle', type: 'text', defaultValue: 'Shipping & Returns — UglyLook' },
         { name: 'metaDescription', type: 'text', defaultValue: 'Shipping info, return policy, and international fulfillment details.' },
+        { name: 'metaImage', type: 'upload' as const, relationTo: 'media' as const, admin: { description: 'Social sharing image (1200×630 recommended).' } },
       ],
     },
     {
@@ -80,12 +95,25 @@ export const SizeGuideConfig: GlobalConfig = {
   slug: 'sizeGuidePage',
   label: 'Size Guide',
   access: { read: () => true, update: adminOnly },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: { url: generateGlobalPreviewPath('sizeGuidePage') },
+    preview: () => generateGlobalPreviewPath('sizeGuidePage'),
+  },
   fields: [
     {
       type: 'collapsible', label: 'Page Metadata', admin: { initCollapsed: true },
       fields: [
         { name: 'metaTitle', type: 'text', defaultValue: 'Size Guide — UglyLook' },
         { name: 'metaDescription', type: 'text', defaultValue: 'Sizing charts and fit guide for UglyLook apparel.' },
+        { name: 'metaImage', type: 'upload' as const, relationTo: 'media' as const, admin: { description: 'Social sharing image (1200×630 recommended).' } },
       ],
     },
     {
@@ -143,12 +171,25 @@ export const PrivacyConfig: GlobalConfig = {
   slug: 'privacyPage',
   label: 'Privacy Policy',
   access: { read: () => true, update: adminOnly },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: { url: generateGlobalPreviewPath('privacyPage') },
+    preview: () => generateGlobalPreviewPath('privacyPage'),
+  },
   fields: [
     {
       type: 'collapsible', label: 'Page Metadata', admin: { initCollapsed: true },
       fields: [
         { name: 'metaTitle', type: 'text', defaultValue: 'Privacy Policy — UglyLook' },
         { name: 'metaDescription', type: 'text', defaultValue: 'How UglyLook handles your data. Short version: carefully.' },
+        { name: 'metaImage', type: 'upload' as const, relationTo: 'media' as const, admin: { description: 'Social sharing image (1200×630 recommended).' } },
       ],
     },
     {
@@ -188,12 +229,25 @@ export const TermsConfig: GlobalConfig = {
   slug: 'termsPage',
   label: 'Terms of Service',
   access: { read: () => true, update: adminOnly },
+  versions: {
+    drafts: { autosave: true },
+    max: 25,
+  },
+  hooks: {
+    afterChange: [revalidateGlobal],
+  },
+  admin: {
+    group: 'Globals',
+    livePreview: { url: generateGlobalPreviewPath('termsPage') },
+    preview: () => generateGlobalPreviewPath('termsPage'),
+  },
   fields: [
     {
       type: 'collapsible', label: 'Page Metadata', admin: { initCollapsed: true },
       fields: [
         { name: 'metaTitle', type: 'text', defaultValue: 'Terms of Service — UglyLook' },
         { name: 'metaDescription', type: 'text', defaultValue: 'Terms and conditions for using UglyLook.' },
+        { name: 'metaImage', type: 'upload' as const, relationTo: 'media' as const, admin: { description: 'Social sharing image (1200×630 recommended).' } },
       ],
     },
     {

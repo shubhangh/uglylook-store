@@ -123,13 +123,13 @@
   animation: float 8s ease-in-out infinite 2s;
 }
 
-.tee {
-  width: 140px;
+.shape1 {
+  width: 160px;
   height: auto;
 }
 
-.hoodie {
-  width: 120px;
+.shape2 {
+  width: 130px;
   height: auto;
 }
 
