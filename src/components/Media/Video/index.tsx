@@ -25,7 +25,7 @@ export const Video: React.FC<MediaProps> = (props) => {
     const { filename, url } = resource
 
     // Use R2 URL when available, fall back to local path
-    const videoSrc = url ?? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${filename}`
+    const videoSrc = url ?? `/media/${filename}`
 
     return (
       <video

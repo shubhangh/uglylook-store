@@ -61,7 +61,7 @@ export const AdminBar: React.FC<{
             logo: 'text-white',
             user: 'text-white',
           }}
-          cmsURL={process.env.NEXT_PUBLIC_SERVER_URL}
+          cmsURL={typeof window !== 'undefined' ? window.location.origin : ''}
           collectionLabels={{
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore - todo fix, not sure why this is erroring

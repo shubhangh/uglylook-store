@@ -105,6 +105,11 @@ export default buildConfig({
   collections: [Customers, Pages, Posts, Categories, Media, Team, GlobalKeys, MyKeys, Subscribers, Redirects, Coupons, Offers, Buckets, AIGraphics, Designs, PrintifyCatalog, PrintifyLauncher, PrintifyDesignStudio, PrintifyAnalysis, PrintifyFulfillment, DesignPresets, AIModelRegistry, PrintifyCatalogCache, PrintifySyncLog, R2Browser, BulkUploads, BulkReads, BulkFeedback, AIProductAnalysisCache, WorkflowGuide],
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
+    connectOptions: {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      maxIdleTimeMS: 30000,
+    },
   }),
   editor: lexicalEditor({
     features: () => {
