@@ -115,12 +115,25 @@ export async function embedDesignOnProduct(
   designImageUrl: string,
   embeddingPrompt: string,
   payload?: Payload,
+  _aiModelId?: string,
 ): Promise<string> {
-  // Fetch both images as base64
-  const [productB64, designB64] = await Promise.all([
-    fetchAsBase64(productImageUrl),
-    fetchAsBase64(designImageUrl),
-  ])
+  const designB64 = await fetchAsBase64(designImageUrl)
+
+  // If no product base image, use design as single reference (generate from scratch)
+  if (!productImageUrl) {
+    const job = await bflRequest('/flux-2-pro', {
+      prompt: embeddingPrompt,
+      input_image: designB64,
+      width: 928,
+      height: 1152,
+      output_format: 'jpeg',
+      safety_tolerance: 5,
+    }, payload)
+    return pollResult(job.id, payload)
+  }
+
+  // Full multi-reference: product base + design overlay
+  const productB64 = await fetchAsBase64(productImageUrl)
 
   const job = await bflRequest('/flux-2-pro', {
     prompt: embeddingPrompt,

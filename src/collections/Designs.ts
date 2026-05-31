@@ -7,7 +7,7 @@ export const Designs: CollectionConfig = {
   admin: {
     group: 'Ecommerce',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'designLane', 'emotionTier', 'forCategories', 'isPinned', 'status', 'usageCount'],
+    defaultColumns: ['title', 'ulTitle', 'type', 'designLane', 'emotionTier', 'forCategories', 'isPinned', 'status', 'usageCount'],
   },
   access: {
     create: () => true,
@@ -21,7 +21,6 @@ export const Designs: CollectionConfig = {
     {
       name: 'ulTitle',
       type: 'text',
-      unique: true,
       index: true,
       admin: { description: 'Internal slug: title-model-name (e.g., "melt-protocol-flux-2-0-pro"). Auto-generated.' },
     },

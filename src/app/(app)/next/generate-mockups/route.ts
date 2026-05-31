@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { isOwnerOrAdmin } from '@/access/utilities'
 import { getAvailableImageModels } from '@/lib/design-image-engine'
 import { embedDesignOnProduct } from '@/lib/image-pipeline'
-import { uploadImageByUrl, getBlueprint } from '@/lib/printify'
+import { uploadImageByUrl } from '@/lib/printify'
 
 /**
  * GET /next/generate-mockups
@@ -67,9 +67,11 @@ export async function POST(req: Request): Promise<Response> {
       providerId,
       category = 'tees',
       productTitle = 'UglyLook Product',
-      editorialCount = 2,
+      colors = [],
+      editorialCount = 4,
       skipPrintify = false,
       skipAI = false,
+      aiModelId,
     } = body
 
     // Resolve design URL and title
@@ -105,11 +107,11 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // ── 2. AI Editorial — embed design onto Printify blueprint photos ──
-    if (!skipAI && editorialCount > 0 && blueprintId) {
+    // ── 2. AI Editorial — generate per-color model shots ──
+    if (!skipAI && editorialCount > 0) {
       try {
         const shots = await generateAIEditorial(
-          designUrl, designTitle, blueprintId, category, productTitle, editorialCount, payload,
+          designUrl, designTitle, blueprintId, category, productTitle, colors, editorialCount, aiModelId, payload,
         )
         results.aiEditorialShots = shots.images
         if (shots.errors.length) results.errors.push(...shots.errors)
@@ -144,7 +146,9 @@ type MockupImage = {
 }
 
 // ── AI Editorial Generation ──
-// Uses Printify blueprint blank photos as base → embeds design via FLUX.2 Pro
+// Generates per-color model shots with different angles, GenZ aesthetic
+
+const ANGLES = ['front facing', 'slight 3/4 turn to the left', 'slight 3/4 turn to the right', 'looking down at angle with garment visible']
 
 async function generateAIEditorial(
   designUrl: string,
@@ -152,70 +156,62 @@ async function generateAIEditorial(
   blueprintId: number,
   category: string,
   productTitle: string,
-  count: number,
+  colors: string[],
+  countPerColor: number,
+  aiModelId: string | undefined,
   payload: any,
 ): Promise<{ images: MockupImage[]; errors: string[] }> {
   const images: MockupImage[] = []
   const errors: string[] = []
 
-  // Fetch blueprint to get blank product photos
-  let blueprintImages: string[] = []
-  try {
-    const blueprint = await getBlueprint(blueprintId)
-    blueprintImages = blueprint.images || []
-  } catch (err: any) {
-    errors.push(`Failed to fetch blueprint images: ${err.message}`)
-    return { images, errors }
-  }
-
-  if (blueprintImages.length === 0) {
-    errors.push('No blueprint images available for this product')
-    return { images, errors }
-  }
-
   const garmentType = getGarmentType(category)
   const slug = productTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-')
-  const embedPrompt = buildEmbedPrompt(garmentType, category, designTitle)
+  const effectiveColors = colors.length > 0 ? colors : ['black']
+  const totalImages = effectiveColors.length * countPerColor
 
-  // Use up to `count` blueprint images as base, cycling if fewer available
-  for (let i = 0; i < Math.min(count, 4); i++) {
-    const baseImageUrl = blueprintImages[i % blueprintImages.length]
+  payload.logger.info(`[Mockups] Generating ${totalImages} AI editorial shots (${countPerColor} per color × ${effectiveColors.length} colors)`)
 
-    try {
-      payload.logger.info(`[Mockups] Embedding design onto blueprint photo ${i + 1}/${count}...`)
+  let imageIndex = 0
+  for (const color of effectiveColors) {
+    for (let i = 0; i < countPerColor; i++) {
+      const angle = ANGLES[i % ANGLES.length]
+      const prompt = buildModelPrompt(garmentType, color, angle, designTitle, category)
 
-      // Embed the actual design onto the blueprint product photo
-      const compositeUrl = await embedDesignOnProduct(baseImageUrl, designUrl, embedPrompt, payload)
+      try {
+        payload.logger.info(`[Mockups] Generating ${color} shot ${i + 1}/${countPerColor} (${angle})...`)
 
-      // Download and upload to Payload media
-      const compRes = await fetch(compositeUrl)
-      if (!compRes.ok) {
-        errors.push(`Editorial ${i + 1}: failed to download composite`)
-        continue
+        const compositeUrl = await embedDesignOnProduct('', designUrl, prompt, payload, aiModelId)
+
+        const compRes = await fetch(compositeUrl)
+        if (!compRes.ok) {
+          errors.push(`${color} shot ${i + 1}: failed to download`)
+          continue
+        }
+
+        const compBuffer = Buffer.from(await compRes.arrayBuffer())
+        const compMedia = await payload.create({
+          collection: 'media',
+          data: { alt: `${productTitle} — ${color} ${angle}` },
+          file: {
+            data: compBuffer,
+            mimetype: 'image/jpeg',
+            name: `${slug}-${color}-${i + 1}.jpg`,
+            size: compBuffer.length,
+          },
+        })
+
+        images.push({
+          mediaId: compMedia.id,
+          url: (compMedia as any).url || '',
+          label: `${color} — ${angle}`,
+        })
+
+        imageIndex++
+        payload.logger.info(`[Mockups] ${imageIndex}/${totalImages} complete`)
+      } catch (err: any) {
+        errors.push(`${color} shot ${i + 1} failed: ${err.message}`)
+        payload.logger.warn(`[Mockups] ${color} shot ${i + 1} failed: ${err.message}`)
       }
-
-      const compBuffer = Buffer.from(await compRes.arrayBuffer())
-      const compMedia = await payload.create({
-        collection: 'media',
-        data: { alt: `${productTitle} — editorial ${i + 1}` },
-        file: {
-          data: compBuffer,
-          mimetype: 'image/jpeg',
-          name: `${slug}-editorial-${i + 1}.jpg`,
-          size: compBuffer.length,
-        },
-      })
-
-      images.push({
-        mediaId: compMedia.id,
-        url: (compMedia as any).url || '',
-        label: `Editorial ${i + 1}`,
-      })
-
-      payload.logger.info(`[Mockups] Editorial ${i + 1}/${count} complete`)
-    } catch (err: any) {
-      errors.push(`Editorial ${i + 1} failed: ${err.message}`)
-      payload.logger.warn(`[Mockups] Editorial ${i + 1} failed: ${err.message}`)
     }
   }
 
@@ -346,16 +342,40 @@ function getGarmentType(category: string): string {
   return map[category] || 'garment'
 }
 
-function buildEmbedPrompt(garmentType: string, category: string, designTitle: string): string {
-  const designRef = designTitle ? `The design is called "${designTitle}".` : ''
+function buildModelPrompt(garmentType: string, color: string, angle: string, designTitle: string, category: string): string {
+  const designRef = designTitle ? `The print design is called "${designTitle}".` : ''
+
+  // Determine contrasting background color
+  const bgColor = getContrastBackground(color)
 
   if (category === 'hats' || category === 'caps') {
-    return `Product photo editing task. Take the first reference image (a cap) and apply the design from the second reference image as an embroidered patch on the front panel. Reproduce the design EXACTLY as shown in the second reference image. The patch should look genuinely sewn on, following the cap curvature. Centered on front panel. Keep everything else unchanged. ${designRef}`
+    return `Editorial fashion photograph. A Gen Z model (early 20s, effortlessly cool, relaxed posture) wearing a ${color} ${garmentType} with the design from the reference image as an embroidered patch on the front panel. Model is ${angle}. Arms relaxed at sides or one hand adjusting the cap brim — NEVER arms crossed. Background: ${bgColor}, clean studio lighting. Reproduce the design EXACTLY as shown in the reference image — no modifications, no extra text, no additional prints or graphics anywhere on the garment. ${designRef}`
   }
 
   if (category === 'totes') {
-    return `Product photo editing task. Take the first reference image (a tote bag) and screen-print the design from the second reference image onto the center front. Reproduce the design EXACTLY as shown. The print should look natural on the fabric. Centered, approximately 18cm wide. Keep everything else unchanged. ${designRef}`
+    return `Editorial fashion photograph. A Gen Z model (early 20s, effortlessly cool, aesthetic posture) casually holding a ${color} canvas tote bag with the design from the reference image screen-printed on center front. Model is ${angle}. Arms naturally holding or draping the tote — NEVER arms crossed. Background: ${bgColor}, clean studio lighting. Reproduce the design EXACTLY as shown in the reference image — no modifications, no extra text, no additional prints on the bag. ${designRef}`
   }
 
-  return `Product photo editing task. Take the first reference image and screen-print the design from the second reference image onto the center chest of the ${garmentType}. Reproduce the design EXACTLY as shown in the second reference image — same shapes, same proportions, same elements. The print should look natural on matte fabric with texture visible through the ink. Centered on chest. Keep everything else unchanged — product, pose, background, lighting. ${designRef}`
+  return `Editorial fashion photograph. A Gen Z model (early 20s, effortlessly cool, natural aesthetic vibe) wearing a ${color} ${garmentType} with the design from the reference image screen-printed on the center chest. Model is ${angle}. Relaxed, confident posture — hands in pockets, at sides, or one hand touching hair. NEVER arms crossed or folded (this would cover the design). Background: ${bgColor}, clean studio lighting with subtle shadows. The print should look natural on the fabric. Reproduce the design EXACTLY as shown in the reference image — same shapes, same proportions, same elements. Do NOT add any other prints, text, logos, or graphics anywhere on the garment besides the reference design. ${designRef}`
+}
+
+function getContrastBackground(garmentColor: string): string {
+  const color = garmentColor.toLowerCase()
+  if (color.includes('black') || color.includes('dark') || color.includes('navy') || color.includes('charcoal')) {
+    return 'warm off-white concrete wall with soft golden light'
+  }
+  if (color.includes('white') || color.includes('cream') || color.includes('bone') || color.includes('light')) {
+    return 'deep charcoal textured wall with cool blue-tinted lighting'
+  }
+  if (color.includes('red') || color.includes('orange') || color.includes('rust')) {
+    return 'muted sage green industrial backdrop'
+  }
+  if (color.includes('blue') || color.includes('teal') || color.includes('navy')) {
+    return 'warm terracotta or sandy stone wall'
+  }
+  if (color.includes('green') || color.includes('olive') || color.includes('sage')) {
+    return 'soft dusty rose or warm clay-colored wall'
+  }
+  // Default: neutral contrast
+  return 'minimalist urban concrete with directional studio lighting'
 }

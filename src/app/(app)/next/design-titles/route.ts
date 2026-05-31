@@ -35,7 +35,8 @@ export async function POST(req: Request): Promise<Response> {
 
     const apiKey = await resolveApiKey('anthropic', user?.id || null, payload)
     if (!apiKey) {
-      return Response.json({ error: 'Anthropic API key not configured.' }, { status: 400 })
+      payload.logger.error('[design-titles] No Anthropic API key found for user ' + user?.id)
+      return Response.json({ error: 'Anthropic API key not configured. Add it in Global Keys or My API Keys.' }, { status: 400 })
     }
 
     const count = images.length
@@ -82,22 +83,38 @@ Return ONLY a JSON array of objects, one per image, in the same order:
 
     const match = text.match(/\[[\s\S]*\]/)
     if (!match) {
+      payload.logger.error(`[design-titles] No JSON array in response: ${text.slice(0, 300)}`)
       return Response.json({ error: 'Failed to parse AI response' }, { status: 500 })
     }
 
-    const parsed: { title: string; type?: string; lane?: string }[] = JSON.parse(match[0])
+    let parsed: { title: string; type?: string; lane?: string }[]
+    try {
+      parsed = JSON.parse(match[0])
+    } catch (parseErr) {
+      payload.logger.error(`[design-titles] JSON parse failed: ${match[0].slice(0, 300)}`)
+      return Response.json({ error: 'Failed to parse AI JSON' }, { status: 500 })
+    }
 
-    // Build ul-title: slugified title + model name suffix
+    // Build ul-title: slugified title + model name suffix + index for uniqueness
     const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
+    const seenSlugs = new Set<string>()
     const result = images.map((img: any, i: number) => {
       const entry = parsed[i] || { title: `Design ${img.index + 1}` }
       const titleSlug = slugify(entry.title)
       const modelSlug = slugify(img.modelDisplayName || img.model || 'unknown')
+      let ulTitle = `${titleSlug}-${modelSlug}`
+
+      // Deduplicate within this batch
+      if (seenSlugs.has(ulTitle)) {
+        ulTitle = `${ulTitle}-${i + 1}`
+      }
+      seenSlugs.add(ulTitle)
+
       return {
         id: img.id,
         title: entry.title,
-        ulTitle: `${titleSlug}-${modelSlug}`,
+        ulTitle,
         type: entry.type || img.type || 'graphic',
         lane: entry.lane || img.lane || '',
       }

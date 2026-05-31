@@ -900,15 +900,21 @@ export const DesignStudio: React.FC = () => {
 
   const [titlesLoading, setTitlesLoading] = useState(false)
 
-  const autoGenerateTitles = async (images: GeneratedImage[]) => {
+  const [titlesError, setTitlesError] = useState<string>('')
+
+  const autoGenerateTitles = async (images?: GeneratedImage[]) => {
+    const targetImages = images || generatedImages
+    if (!targetImages.length) return
+
     setTitlesLoading(true)
+    setTitlesError('')
     try {
       const res = await fetch('/next/design-titles', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          images: images.map((img) => ({
+          images: targetImages.map((img) => ({
             id: img.id,
             index: img.index,
             model: img.model,
@@ -921,26 +927,33 @@ export const DesignStudio: React.FC = () => {
         }),
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        if (data.titles?.length) {
-          setGeneratedImages((prev) =>
-            prev.map((img) => {
-              const match = data.titles.find((t: any) => t.id === img.id)
-              if (!match) return img
-              return {
-                ...img,
-                title: match.title || img.title,
-                ulTitle: match.ulTitle || img.ulTitle,
-                type: match.type || img.type,
-                lane: match.lane || img.lane,
-              }
-            }),
-          )
-        }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
+        setTitlesError(errData.error || `Title generation failed (${res.status})`)
+        setTitlesLoading(false)
+        return
       }
-    } catch {
-      // Non-critical — metadata can be set manually
+
+      const data = await res.json()
+      if (data.titles?.length) {
+        setGeneratedImages((prev) =>
+          prev.map((img) => {
+            const match = data.titles.find((t: any) => t.id === img.id)
+            if (!match) return img
+            return {
+              ...img,
+              title: match.title || img.title,
+              ulTitle: match.ulTitle || img.ulTitle,
+              type: match.type || img.type,
+              lane: match.lane || img.lane,
+            }
+          }),
+        )
+      } else {
+        setTitlesError('AI returned empty titles array')
+      }
+    } catch (err: any) {
+      setTitlesError(err?.message || 'Title generation request failed')
     }
     setTitlesLoading(false)
   }
@@ -1048,6 +1061,7 @@ export const DesignStudio: React.FC = () => {
             mimeType: img.mimeType,
             metadata: {
               title: img.title || `Design ${img.index + 1}`,
+              ulTitle: img.ulTitle || undefined,
               type: img.type || 'graphic',
               designLane: img.lane || undefined,
               emotionTier: img.emotion || undefined,
@@ -1060,6 +1074,9 @@ export const DesignStudio: React.FC = () => {
               generationCost: generationCost / approved.length,
               promptModel: promptModelUsed,
               imageModel: img.model,
+              imageModelDisplayName: img.modelDisplayName,
+              generatedAt: img.generatedAt || new Date().toISOString(),
+              generationTimeSeconds: generationTime || undefined,
               presetId: usePreset && selectedPresetId ? selectedPresetId : undefined,
               // Pass raw graphic for ai-graphics collection (when text overlay was used)
               sourceGraphic: (rawGraphic && tcEnabled) ? {
@@ -1866,7 +1883,21 @@ export const DesignStudio: React.FC = () => {
               {' '}| {generationTime}s | Cost: ${generationCost.toFixed(3)}
               {rawGraphics.length > 0 && <span style={{ color: '#8B9A6B', marginLeft: 8 }}>· text composited</span>}
               {titlesLoading && <span style={{ color: '#8B9A6B', marginLeft: 8 }}>· generating titles...</span>}
+              {titlesError && (
+                <span style={{ color: '#e06060', marginLeft: 8, fontSize: 11 }}>
+                  · titles failed: {titlesError}
+                </span>
+              )}
             </span>
+            {!titlesLoading && generatedImages.some((img) => !img.title) && (
+              <button
+                className="ds-btn ds-btn--ghost"
+                onClick={() => autoGenerateTitles()}
+                style={{ marginLeft: 'auto', fontSize: 11 }}
+              >
+                {titlesError ? 'Retry Titles' : 'Generate Titles'}
+              </button>
+            )}
           </div>
 
           {/* Bulk actions toolbar */}

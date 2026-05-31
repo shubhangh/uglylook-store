@@ -305,7 +305,7 @@ function MockupGenerator({
 }) {
   const [aiModels, setAiModels] = useState<Record<string, AIModelOption[]>>({})
   const [selectedModel, setSelectedModel] = useState('flux-2-pro')
-  const [editorialCount, setEditorialCount] = useState(2)
+  const [editorialCount, setEditorialCount] = useState(4)
   const [generating, setGenerating] = useState(false)
   const [progress, setProgress] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -333,11 +333,16 @@ function MockupGenerator({
 
   const hasDesign = !!(designId || designUrl)
 
+  const [progressPercent, setProgressPercent] = useState(0)
+
   const handleGenerate = async () => {
     if (!hasDesign) return
     setGenerating(true)
     setError(null)
-    setProgress('Generating mockups...')
+    setProgressPercent(5)
+
+    const totalExpected = colors.length * editorialCount
+    setProgress(`Generating ${totalExpected} mockups (${editorialCount} per color × ${colors.length} color${colors.length !== 1 ? 's' : ''})...`)
 
     try {
       const res = await fetch('/next/generate-mockups', {
@@ -357,8 +362,17 @@ function MockupGenerator({
         }),
       })
 
+      // Simulate progress while waiting
+      const progressInterval = setInterval(() => {
+        setProgressPercent((p) => Math.min(p + 3, 85))
+      }, 800)
+
       const data = await res.json()
+      clearInterval(progressInterval)
+
       if (!res.ok) throw new Error(data.error || 'Generation failed')
+
+      setProgressPercent(95)
 
       const newMockups: MockupImage[] = []
 
@@ -371,6 +385,7 @@ function MockupGenerator({
       }
 
       onMockupsGenerated([...mockups, ...newMockups])
+      setProgressPercent(100)
 
       if (data.errors?.length) {
         setError(`Generated with warnings: ${data.errors.join('; ')}`)
@@ -381,6 +396,7 @@ function MockupGenerator({
       setError(err.message)
     } finally {
       setGenerating(false)
+      setTimeout(() => setProgressPercent(0), 2000)
     }
   }
 
@@ -430,9 +446,9 @@ function MockupGenerator({
           <input
             type="number"
             value={editorialCount}
-            onChange={(e) => setEditorialCount(Math.max(0, Math.min(4, Number(e.target.value))))}
+            onChange={(e) => setEditorialCount(Math.max(0, Math.min(8, Number(e.target.value))))}
             min={0}
-            max={4}
+            max={8}
             disabled={generating}
           />
         </div>
@@ -448,6 +464,12 @@ function MockupGenerator({
 
       {!hasDesign && (
         <div className="mockup-gen__hint">Pick a design above to generate mockups.</div>
+      )}
+
+      {generating && progressPercent > 0 && (
+        <div className="mockup-gen__progress-bar">
+          <div className="mockup-gen__progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+        </div>
       )}
 
       {progress && !error && (
@@ -730,7 +752,7 @@ export const ProductLauncher: React.FC = () => {
           category: f.sku.category,
           designId: f.designId || undefined,
           designUrl: f.designUrl || undefined,
-          galleryMediaIds: f.mockups.map((m) => m.mediaId).filter(Boolean),
+          galleryMediaIds: f.mockups.filter((m) => m.approved !== false).map((m) => m.mediaId).filter(Boolean),
           colors: f.colors,
           sizes: f.sizes,
           placement: f.placement,

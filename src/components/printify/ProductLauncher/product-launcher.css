@@ -794,6 +794,22 @@
   font-style: italic;
 }
 
+.mockup-gen__progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--theme-elevation-200, #2a2a2a);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.mockup-gen__progress-bar-fill {
+  height: 100%;
+  background: #5A6242;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
 .mockup-gen__progress {
   font-size: 12px;
   color: #8B9A6B;

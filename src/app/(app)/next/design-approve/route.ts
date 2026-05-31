@@ -130,17 +130,22 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     // Create Designs collection document
-    const designDoc = await payload.create({
+    // ulTitle may conflict (old unique index) — retry with timestamp suffix on duplicate key error
+    let ulTitle = metadata.ulTitle || undefined
+    let designDoc: any
+
+    const createDesign = async () => payload.create({
       collection: 'designs' as any,
       data: {
         title: metadata.title,
+        ulTitle,
         designFile: mediaDoc.id,
         designUrl,
         type: metadata.type || 'graphic',
         designLane: metadata.designLane || undefined,
         emotionTier: metadata.emotionTier || undefined,
         emotionPrimary: metadata.emotionPrimary || '',
-        forCategories: metadata.forCategories || [],
+        forCategories: metadata.forCategories?.length ? metadata.forCategories : ['all'],
         forGarmentColors: metadata.forGarmentColors || [],
         printText: metadata.printText || '',
         fontInfo: metadata.fontInfo || '',
@@ -150,6 +155,10 @@ export async function POST(req: Request): Promise<Response> {
         generationCost: metadata.generationCost || 0,
         promptModel: metadata.promptModel || '',
         imageModel: metadata.imageModel || '',
+        imageModelDisplayName: metadata.imageModelDisplayName || '',
+        generatedAt: metadata.generatedAt || new Date().toISOString(),
+        generationTimeSeconds: metadata.generationTimeSeconds || undefined,
+        generatedByUser: user.id,
         preset: metadata.presetId || undefined,
         sourceGraphic: sourceGraphicId || undefined,
         status: 'active',
@@ -159,6 +168,18 @@ export async function POST(req: Request): Promise<Response> {
         dpi: 300,
       } as any,
     })
+
+    try {
+      designDoc = await createDesign()
+    } catch (createErr: any) {
+      // Handle duplicate key error on ulTitle (MongoDB E11000)
+      if (createErr?.message?.includes('E11000') || createErr?.message?.includes('duplicate')) {
+        ulTitle = ulTitle ? `${ulTitle}-${Date.now().toString(36)}` : undefined
+        designDoc = await createDesign()
+      } else {
+        throw createErr
+      }
+    }
 
     // Update AI graphic usage count
     if (sourceGraphicId) {

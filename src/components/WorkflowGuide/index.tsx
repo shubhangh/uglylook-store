@@ -50,23 +50,28 @@ const steps = [
   {
     number: 2,
     title: 'Generate Product Mockups',
-    description: 'Turn your design into product images showing how it looks on garments.',
+    description: 'Turn your design into product images — AI generates model shots per color with different angles.',
     substeps: [
       {
         label: 'From the Product Launcher',
         items: [
           'Go to Printify → Product Launcher',
           'Select a design from the picker (or search by title)',
-          'Click "Generate Mockups" — choose AI editorial shots or Printify mockups',
-          'For AI shots: select your preferred image model and count',
-          'Review the generated mockups — approve the best ones for the product gallery',
+          'Select your garment colors — AI generates separate shots for EACH color',
+          'Set AI Shots count (default: 4 per color) — each with a different angle (front, 3/4 left, 3/4 right, angled)',
+          'Pick an AI model (FLUX 2.0 Pro default) and click Generate',
+          'A progress bar shows generation status — all images use the same model for consistency',
+          'Review results: approve (✓) the best ones, reject (✗) the rest',
+          'Only approved mockups are added to the product gallery on launch',
         ],
       },
     ],
     tips: [
-      'AI editorial shots work best for marketing/social media',
-      'Printify mockups give accurate garment representation — use for product pages',
-      'You can generate both and mix them in the final gallery',
+      'The AI uses GenZ-style models with aesthetic poses — arms are never crossed (would cover the design)',
+      'Backgrounds are auto-selected to contrast with the garment color',
+      'The AI will NOT add any extra prints or text — only the design you selected appears on the garment',
+      'Printify mockups (flat-lay) are also generated if Printify is configured — good for product pages',
+      'You can generate multiple rounds and mix Printify + AI shots in the gallery',
     ],
   },
   {
