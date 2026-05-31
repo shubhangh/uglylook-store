@@ -87,6 +87,7 @@ export function getQueueStatus(userId: string): {
   position: number
   progress: {
     completed: number
+    failed: number
     total: number
     costSoFar: number
     costPerImage: number

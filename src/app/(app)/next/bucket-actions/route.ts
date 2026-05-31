@@ -338,7 +338,6 @@ export async function POST(req: Request): Promise<Response> {
           collection: 'products',
           limit: 500,
           depth: 0,
-          select: { id: true },
         })
 
         const productIds = allProducts.docs.map((p) => p.id)
