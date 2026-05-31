@@ -34,6 +34,7 @@ import { BulkUploads } from '@/collections/BulkUploads'
 import { BulkReads } from '@/collections/BulkReads'
 import { BulkFeedback } from '@/collections/BulkFeedback'
 import { AIProductAnalysisCache } from '@/collections/AIProductAnalysisCache'
+import { WorkflowGuide } from '@/collections/WorkflowGuide'
 import { PrintifyFulfillment } from '@/collections/PrintifyFulfillment'
 import { PrintifyCatalog } from '@/collections/PrintifyCatalog'
 import { PrintifyLauncher } from '@/collections/PrintifyLauncher'
@@ -101,7 +102,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname, 'app/(payload)/adm'),
     },
   },
-  collections: [Customers, Pages, Posts, Categories, Media, Team, GlobalKeys, MyKeys, Subscribers, Redirects, Coupons, Offers, Buckets, AIGraphics, Designs, PrintifyCatalog, PrintifyLauncher, PrintifyDesignStudio, PrintifyAnalysis, PrintifyFulfillment, DesignPresets, AIModelRegistry, PrintifyCatalogCache, PrintifySyncLog, R2Browser, BulkUploads, BulkReads, BulkFeedback, AIProductAnalysisCache],
+  collections: [Customers, Pages, Posts, Categories, Media, Team, GlobalKeys, MyKeys, Subscribers, Redirects, Coupons, Offers, Buckets, AIGraphics, Designs, PrintifyCatalog, PrintifyLauncher, PrintifyDesignStudio, PrintifyAnalysis, PrintifyFulfillment, DesignPresets, AIModelRegistry, PrintifyCatalogCache, PrintifySyncLog, R2Browser, BulkUploads, BulkReads, BulkFeedback, AIProductAnalysisCache, WorkflowGuide],
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
