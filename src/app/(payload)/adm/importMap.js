@@ -33,6 +33,7 @@ import { R2Browser as R2Browser_77aea8c5f5c77bdf0514a609c901dede } from '@/compo
 import { BulkUpload as BulkUpload_cee36026061588df6cd822cdb8c73dd7 } from '@/components/BulkUpload/index'
 import { BulkReads as BulkReads_ace9ecabfab8d3eacc65ac367522c035 } from '@/components/BulkReads/index'
 import { BulkFeedback as BulkFeedback_76c09d6811c84cac0ddc9a76ba608221 } from '@/components/BulkFeedback/index'
+import { WorkflowGuide as WorkflowGuide_27d0c173a0b8fee26312592a0d0949c9 } from '@/components/WorkflowGuide/index'
 import { VariantOptionsSelector as VariantOptionsSelector_b91672ccd6e8b071c11142ab941fedfb } from '@payloadcms/plugin-ecommerce/rsc'
 import { PriceCell as PriceCell_e27bf7b8cc50640dcdd584767b8eac3c } from '@payloadcms/plugin-ecommerce/client'
 import { PriceInput as PriceInput_b91672ccd6e8b071c11142ab941fedfb } from '@payloadcms/plugin-ecommerce/rsc'
@@ -85,6 +86,7 @@ export const importMap = {
   "@/components/BulkUpload/index#BulkUpload": BulkUpload_cee36026061588df6cd822cdb8c73dd7,
   "@/components/BulkReads/index#BulkReads": BulkReads_ace9ecabfab8d3eacc65ac367522c035,
   "@/components/BulkFeedback/index#BulkFeedback": BulkFeedback_76c09d6811c84cac0ddc9a76ba608221,
+  "@/components/WorkflowGuide/index#WorkflowGuide": WorkflowGuide_27d0c173a0b8fee26312592a0d0949c9,
   "@payloadcms/plugin-ecommerce/rsc#VariantOptionsSelector": VariantOptionsSelector_b91672ccd6e8b071c11142ab941fedfb,
   "@payloadcms/plugin-ecommerce/client#PriceCell": PriceCell_e27bf7b8cc50640dcdd584767b8eac3c,
   "@payloadcms/plugin-ecommerce/rsc#PriceInput": PriceInput_b91672ccd6e8b071c11142ab941fedfb,
