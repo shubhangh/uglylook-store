@@ -119,15 +119,37 @@ export const Team: CollectionConfig = {
         { label: 'Editor', value: 'editor' },
       ],
       access: {
-        read: () => true, // Everyone can see their own role
-        update: ({ req: { user } }) => isOwnerOrAdmin(user), // Only owner/admin can change roles
+        read: () => true,
+        // Role change access rules:
+        // - Nobody can change their own role (prevents self-escalation and accidental self-demotion)
+        // - Owner can change anyone else's role
+        // - Admin can only change manager/editor roles (not other admins or owners)
+        // - Manager/editor cannot change roles at all
+        update: ({ req: { user }, doc }) => {
+          const u = user as any
+          if (!u?.role) return false
+
+          // Block self-role-change for everyone (including owner)
+          if (u.id === doc?.id) return false
+
+          // Owner can change anyone else's role
+          if (u.role === 'owner') return true
+
+          // Admin can only change manager/editor roles (not admin/owner)
+          if (u.role === 'admin') {
+            const targetRole = (doc as any)?.role
+            return targetRole === 'manager' || targetRole === 'editor'
+          }
+
+          return false
+        },
       },
       admin: {
-        description: 'Owner: full control. Admin: full CRUD. Manager: products + orders. Editor: content only.',
+        description: 'Owner: full control. Admin: full CRUD. Manager: products + orders. Editor: content only. You cannot change your own role.',
       },
       hooks: {
         beforeChange: [
-          async ({ operation, req, value, previousValue }) => {
+          async ({ operation, req, value, previousValue, siblingData }) => {
             const u = req.user as any
 
             // First user is always owner
@@ -142,18 +164,22 @@ export const Team: CollectionConfig = {
               }
             }
 
-            // Only owner can assign the 'owner' role
-            if (value === 'owner' && u?.role !== 'owner') {
+            // Double-check: block self-role-change at hook level too (belt + suspenders)
+            const targetId = siblingData?.id || (req as any).params?.id
+            if (targetId && u?.id === targetId) {
+              return previousValue || value
+            }
+
+            // Only owner can assign 'owner' or 'admin' roles
+            if ((value === 'owner' || value === 'admin') && u?.role !== 'owner') {
               return previousValue || 'editor'
             }
 
-            // Only owner can assign 'admin' role
-            if (value === 'admin' && u?.role !== 'owner') {
-              return previousValue || 'editor'
+            // Admin can only change manager/editor targets
+            if (u?.role === 'admin' && previousValue && !['manager', 'editor'].includes(previousValue)) {
+              return previousValue
             }
 
-            // Admin can assign manager or editor (promote editor → manager, or demote manager → editor)
-            // Manager/editor cannot change roles at all (handled by field access)
             return value
           },
         ],
