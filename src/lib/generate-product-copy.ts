@@ -110,6 +110,7 @@ export async function generateProductCopy(
     `Garment: ${garmentType}`,
     `Category: ${category}`,
     designContext.blueprintTitle ? `Printify product: ${designContext.blueprintTitle}` : null,
+    (designContext as any).productDetails ? `\nProduct details:\n${(designContext as any).productDetails}` : null,
   ]
     .filter(Boolean)
     .join('\n')

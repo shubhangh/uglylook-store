@@ -58,6 +58,7 @@ export const productHatData: (args: ProductArgs) => RequiredDataFromCollectionSl
         version: 1,
       },
     },
+    heroImage: galleryImage,
     gallery: [{ image: galleryImage }],
     title: 'Hat',
     slug: 'hat',

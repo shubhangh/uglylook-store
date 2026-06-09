@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
 import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
 import { revalidateGlobal } from './hooks/revalidateGlobal'
+import { imageDisplayFields } from '@/fields/imageDisplay'
 
 export const DropPageConfig: GlobalConfig = {
   slug: 'dropPage',
@@ -26,6 +27,13 @@ export const DropPageConfig: GlobalConfig = {
         { name: 'metaTitle', type: 'text', defaultValue: 'Next Drop — UglyLook' },
         { name: 'metaDescription', type: 'textarea', defaultValue: 'The next UglyLook drop. Opens when it opens.' },
         { name: 'metaImage', type: 'upload', relationTo: 'media', admin: { description: 'Social sharing image (1200×630 recommended).' } },
+      ],
+    },
+    {
+      type: 'collapsible', label: 'Hero Image', admin: { initCollapsed: true },
+      fields: [
+        { name: 'heroImage', type: 'upload', relationTo: 'media', admin: { description: 'Drop campaign hero image (optional).' } },
+        ...imageDisplayFields('heroImage'),
       ],
     },
     {

@@ -1,0 +1,80 @@
+/* Pre-footer image carousel — continuous horizontal scroll */
+.section {
+  padding: 48px 0;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 var(--gutter, 32px);
+  margin-bottom: 24px;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.labelLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.track {
+  width: 100%;
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: scroll-carousel linear infinite;
+  /* duration set via inline style from CMS */
+}
+
+.slide {
+  flex: 0 0 auto;
+  /* width + height set via inline style from CMS */
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.slide:hover {
+  transform: scale(1.03);
+}
+
+@keyframes scroll-carousel {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Pause on hover */
+@media (hover: hover) {
+  .track:hover .inner {
+    animation-play-state: paused;
+  }
+}
+
+@media (max-width: 600px) {
+  .section { padding: 32px 0; }
+  .labelRow { margin-bottom: 16px; }
+  .inner { gap: 10px; }
+}

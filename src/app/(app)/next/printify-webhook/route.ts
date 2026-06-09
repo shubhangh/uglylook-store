@@ -17,14 +17,16 @@ export async function POST(req: Request): Promise<Response> {
   try {
     const payload = await getPayload({ config })
 
-    // Verify webhook secret if configured
+    // Verify webhook secret — mandatory
     const webhookSecret = process.env.PRINTIFY_WEBHOOK_SECRET
-    if (webhookSecret) {
-      const signature = req.headers.get('x-printify-webhook-token')
-      if (signature !== webhookSecret) {
-        payload.logger.warn('Printify webhook: invalid signature')
-        return Response.json({ error: 'Invalid signature' }, { status: 401 })
-      }
+    if (!webhookSecret) {
+      payload.logger.error('Printify webhook: PRINTIFY_WEBHOOK_SECRET not configured')
+      return Response.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+    const signature = req.headers.get('x-printify-webhook-token')
+    if (signature !== webhookSecret) {
+      payload.logger.warn('Printify webhook: invalid signature')
+      return Response.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     const event: PrintifyWebhookEvent = await req.json()

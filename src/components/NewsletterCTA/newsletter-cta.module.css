@@ -24,7 +24,7 @@
 }
 
 .label {
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--font-inter), system-ui, sans-serif; font-weight: 500;
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -74,7 +74,7 @@
   background: var(--foreground);
   color: var(--background);
   border: none;
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--font-inter), system-ui, sans-serif; font-weight: 500;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -90,7 +90,7 @@
 }
 
 .confirmation {
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--font-inter), system-ui, sans-serif; font-weight: 500;
   font-size: 13px;
   color: var(--olive-text);
   margin-top: 28px;

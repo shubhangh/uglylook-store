@@ -36,6 +36,13 @@ export const pushToPrintify: CollectionAfterChangeHook = async ({
   }
 
   if (doc.printifyOrderId) return doc
+
+  // Skip self-fulfilled orders entirely — no Printify involvement
+  if (doc.fulfillmentSource === 'self') {
+    req.payload.logger.info(`[pushToPrintify] Order ${doc.id} is self-fulfilled — skipping Printify push`)
+    return doc
+  }
+
   if (!doc.items?.length) {
     req.payload.logger.warn(`[pushToPrintify] Order ${doc.id} has no items (keys: ${Object.keys(doc).join(', ')})`)
     return doc

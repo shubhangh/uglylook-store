@@ -221,6 +221,92 @@ export const plugins: Plugin[] = [
               ],
             },
           },
+          // ── Stripe Fields ──
+          {
+            name: 'stripeSessionId',
+            type: 'text',
+            index: true,
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+              description: 'Stripe Checkout Session ID',
+            },
+          },
+          {
+            name: 'stripePaymentIntentId',
+            type: 'text',
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+              description: 'Stripe Payment Intent ID',
+            },
+          },
+          // ── Fulfillment Source ──
+          {
+            name: 'fulfillmentSource',
+            type: 'select',
+            defaultValue: 'pod',
+            options: [
+              { label: 'Print on Demand', value: 'pod' },
+              { label: 'Self-Fulfilled', value: 'self' },
+              { label: 'Mixed', value: 'mixed' },
+            ],
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+              description: 'Auto-set from product fulfillmentType. POD = Printify, Self = manual fulfillment.',
+            },
+          },
+          // ── Self-Fulfillment Fields ──
+          {
+            name: 'selfFulfillment',
+            type: 'group',
+            admin: {
+              condition: (data) => data?.fulfillmentSource === 'self' || data?.fulfillmentSource === 'mixed',
+              description: 'Manual fulfillment tracking — for self-fulfilled orders.',
+            },
+            fields: [
+              {
+                name: 'packedAt',
+                type: 'date',
+                admin: { description: 'When the order was packed and ready to ship.' },
+              },
+              {
+                name: 'packedBy',
+                type: 'relationship',
+                relationTo: 'team',
+              },
+              {
+                name: 'shippedAt',
+                type: 'date',
+              },
+              {
+                name: 'shippedBy',
+                type: 'relationship',
+                relationTo: 'team',
+              },
+              {
+                name: 'deliveredAt',
+                type: 'date',
+              },
+              {
+                name: 'carrier',
+                type: 'select',
+                options: [
+                  { label: 'USPS', value: 'usps' },
+                  { label: 'UPS', value: 'ups' },
+                  { label: 'FedEx', value: 'fedex' },
+                  { label: 'DHL', value: 'dhl' },
+                  { label: 'Other', value: 'other' },
+                ],
+              },
+              {
+                name: 'notes',
+                type: 'textarea',
+                admin: { description: 'Internal notes (packaging, special handling, etc.)' },
+              },
+            ],
+          },
           // ── Printify Fulfillment Fields ──
           {
             name: 'printifyOrderId',

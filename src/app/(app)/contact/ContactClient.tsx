@@ -48,7 +48,7 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
       <div className="container">
         {/* Section Header */}
         <header className="mb-16 md:mb-24">
-          <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+          <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             {data.sectionNumber || 'SEC / 07'}
           </span>
           <h1
@@ -74,14 +74,14 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
 
               <a
                 href={`mailto:${data.email || 'hello@uglylook.com'}`}
-                className="mb-8 inline-block font-mono text-base text-olive-text underline underline-offset-4 transition-colors hover:text-foreground"
+                className="mb-8 inline-block text-base font-medium text-olive-text underline underline-offset-4 transition-colors hover:text-foreground"
               >
                 {data.email || 'hello@uglylook.com'}
               </a>
 
               {(data.showInfoBox ?? true) && (
                 <div className="mt-8 border-t border-border pt-8">
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground leading-[1.8]">
+                  <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground leading-[1.8]">
                     {data.infoBoxLine1 || 'No live chat. No chatbot.'}<br />
                     {data.infoBoxLine2 || 'No \u201chow can I help you today\u201d energy.'}<br />
                     {data.infoBoxLine3 || 'No ticket number. No SLA.'}
@@ -95,7 +95,7 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
           {submitted ? (
             <div className="flex items-center">
               <div>
-                <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase block mb-4">
+                <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase block mb-4">
                   {data.successLabel || 'SENT'}
                 </span>
                 <h2
@@ -114,7 +114,7 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
               <div>
                 <label
                   htmlFor="contact-name"
-                  className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                  className="mb-2 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground"
                 >
                   Name
                 </label>
@@ -127,13 +127,13 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
                   className={`w-full rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.name ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.namePlaceholder || 'your name'}
                 />
-                {errors.name && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.name}</p>}
+                {errors.name && <p className="mt-1.5 text-[10px] font-medium text-destructive">{errors.name}</p>}
               </div>
 
               <div>
                 <label
                   htmlFor="contact-email"
-                  className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                  className="mb-2 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground"
                 >
                   Email
                 </label>
@@ -146,13 +146,13 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
                   className={`w-full rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.emailPlaceholder || 'you@somewhere.com'}
                 />
-                {errors.email && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.email}</p>}
+                {errors.email && <p className="mt-1.5 text-[10px] font-medium text-destructive">{errors.email}</p>}
               </div>
 
               <div>
                 <label
                   htmlFor="contact-subject"
-                  className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                  className="mb-2 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground"
                 >
                   Subject
                 </label>
@@ -168,7 +168,7 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
               <div>
                 <label
                   htmlFor="contact-message"
-                  className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                  className="mb-2 block text-[10px] font-medium uppercase tracking-widest text-muted-foreground"
                 >
                   Message
                 </label>
@@ -181,12 +181,12 @@ export function ContactClient({ data: initialData }: { data: ContactPage }) {
                   className={`w-full resize-none rounded-none border-0 border-b bg-transparent px-0 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.message ? 'border-destructive' : 'border-input focus:border-olive'}`}
                   placeholder={data.messagePlaceholder || 'keep it short or don\'t. we\'ll read it either way.'}
                 />
-                {errors.message && <p className="mt-1.5 font-mono text-[10px] text-destructive">{errors.message}</p>}
+                {errors.message && <p className="mt-1.5 text-[10px] font-medium text-destructive">{errors.message}</p>}
               </div>
 
               <button
                 type="submit"
-                className="rounded-[4px] bg-olive px-8 py-3 font-mono text-[11px] uppercase tracking-widest text-cream transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-olive focus:ring-offset-2 focus:ring-offset-background"
+                className="rounded-[4px] bg-olive px-8 py-3 text-[11px] font-medium uppercase tracking-widest text-cream transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-olive focus:ring-offset-2 focus:ring-offset-background"
               >
                 {data.submitText || 'Send'}
               </button>

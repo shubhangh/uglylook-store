@@ -9,6 +9,8 @@ const globalPageMap: Record<string, string> = {
   dropPage: '/drop',
   contactPage: '/contact',
   faqPage: '/faq',
+  aboutPage: '/about',
+  collectionsPage: '/collections',
   shippingReturnsPage: '/shipping-returns',
   sizeGuidePage: '/size-guide',
   privacyPage: '/privacy',

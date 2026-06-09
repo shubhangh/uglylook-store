@@ -10,8 +10,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${url}/`, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${url}/shop`, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${url}/thesis`, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${url}/lanes`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${url}/about`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${url}/collections`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${url}/journal`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${url}/drop`, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${url}/contact`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${url}/faq`, changeFrequency: 'monthly', priority: 0.3 },
@@ -19,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${url}/size-guide`, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${url}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${url}/terms`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${url}/blog`, changeFrequency: 'weekly', priority: 0.7 },
   ]
 
   // Products
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })
 
   const postPages: MetadataRoute.Sitemap = posts.docs.map((post) => ({
-    url: `${url}/blog/${post.slug}`,
+    url: `${url}/journal/${post.slug}`,
     lastModified: post.updatedAt,
     changeFrequency: 'monthly',
     priority: 0.7,

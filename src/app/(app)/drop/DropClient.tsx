@@ -61,7 +61,7 @@ export function DropClient({ data: initialData }: { data: DropPage }) {
         {/* ── Section Header ── */}
         {(data.showHeader ?? true) && (
           <header className="mb-16 md:mb-24">
-            <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+            <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
               {data.sectionNumber || 'SEC / 06'}
             </span>
             <h1

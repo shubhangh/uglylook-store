@@ -1,11 +1,20 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { rateLimit, getClientIP } from '@/lib/rate-limit'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function POST(req: Request): Promise<Response> {
   try {
+    const ip = getClientIP(req)
+    const { allowed } = rateLimit(`subscribe:${ip}`, 5, 60_000)
+    if (!allowed) {
+      return Response.json({ error: 'Too many requests. Try again later.' }, { status: 429 })
+    }
+
     const { email, source } = await req.json()
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email) || email.length > 254) {
       return Response.json({ error: 'Valid email required.' }, { status: 400 })
     }
 

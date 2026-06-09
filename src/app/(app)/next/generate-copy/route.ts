@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 import { generateProductCopy } from '@/lib/generate-product-copy'
+import { safeFetchImage } from '@/lib/safe-fetch'
 
 /**
  * POST /next/generate-copy
@@ -28,7 +29,7 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     const body = await req.json()
-    const { designId, category, blueprintTitle, blueprintImageUrl, mockupMediaId } = body
+    const { designId, category, blueprintTitle, blueprintImageUrl, mockupMediaId, productContext } = body
 
     if (!designId) {
       return Response.json({ error: 'designId is required' }, { status: 400 })
@@ -46,7 +47,7 @@ export async function POST(req: Request): Promise<Response> {
       return Response.json({ error: 'Design not found' }, { status: 404 })
     }
 
-    const designContext = {
+    const designContext: any = {
       designTitle: design.title || '',
       designLane: design.designLane || '',
       emotionTier: design.emotionTier || '',
@@ -57,6 +58,18 @@ export async function POST(req: Request): Promise<Response> {
       blueprintTitle: blueprintTitle || '',
     }
 
+    // E4: Enrich with product context if provided
+    if (productContext) {
+      designContext.productDetails = [
+        productContext.colors?.length ? `Available colors: ${productContext.colors.join(', ')}` : null,
+        productContext.sizes?.length ? `Available sizes: ${productContext.sizes.join(', ')}` : null,
+        productContext.providerTitle ? `Print provider: ${productContext.providerTitle}` : null,
+        productContext.printAreaFront ? `Print area: ${productContext.printAreaFront.width}×${productContext.printAreaFront.height}px` : null,
+        productContext.adminPrice ? `Retail price: $${productContext.adminPrice}` : null,
+        productContext.variantCount ? `Total variants: ${productContext.variantCount}` : null,
+      ].filter(Boolean).join('\n')
+    }
+
     const garment = getGarmentType(category || 'tees')
 
     // Collect images to send to Gemini for visual context
@@ -65,30 +78,18 @@ export async function POST(req: Request): Promise<Response> {
     // 1. Design image (the actual print file)
     const designFileUrl = design.designFile?.url || design.designUrl
     if (designFileUrl) {
-      try {
-        const res = await fetch(designFileUrl)
-        if (res.ok) {
-          images.push({
-            buffer: Buffer.from(await res.arrayBuffer()),
-            mimeType: res.headers.get('content-type') || 'image/png',
-            label: 'design',
-          })
-        }
-      } catch { /* non-critical */ }
+      const result = await safeFetchImage(designFileUrl)
+      if (result) {
+        images.push({ ...result, label: 'design' })
+      }
     }
 
     // 2. Blueprint product photo (the Printify garment)
     if (blueprintImageUrl) {
-      try {
-        const res = await fetch(blueprintImageUrl)
-        if (res.ok) {
-          images.push({
-            buffer: Buffer.from(await res.arrayBuffer()),
-            mimeType: res.headers.get('content-type') || 'image/jpeg',
-            label: 'product',
-          })
-        }
-      } catch { /* non-critical */ }
+      const result = await safeFetchImage(blueprintImageUrl)
+      if (result) {
+        images.push({ ...result, label: 'product' })
+      }
     }
 
     // 3. Mockup image (design on product — best context)
@@ -97,13 +98,9 @@ export async function POST(req: Request): Promise<Response> {
         const media = await payload.findByID({ collection: 'media', id: mockupMediaId, depth: 0 })
         const mediaUrl = (media as any).url
         if (mediaUrl) {
-          const res = await fetch(mediaUrl)
-          if (res.ok) {
-            images.push({
-              buffer: Buffer.from(await res.arrayBuffer()),
-              mimeType: res.headers.get('content-type') || 'image/jpeg',
-              label: 'mockup',
-            })
+          const result = await safeFetchImage(mediaUrl)
+          if (result) {
+            images.push({ ...result, label: 'mockup' })
           }
         }
       } catch { /* non-critical */ }

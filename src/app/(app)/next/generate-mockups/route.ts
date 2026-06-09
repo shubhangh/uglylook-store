@@ -72,6 +72,10 @@ export async function POST(req: Request): Promise<Response> {
       skipPrintify = false,
       skipAI = false,
       aiModelId,
+      // E5+E6: Model persona + product context
+      modelPersonaId,
+      referenceImageUrl,
+      productContext,
     } = body
 
     // Resolve design URL and title
@@ -112,6 +116,7 @@ export async function POST(req: Request): Promise<Response> {
       try {
         const shots = await generateAIEditorial(
           designUrl, designTitle, blueprintId, category, productTitle, colors, editorialCount, aiModelId, payload,
+          referenceImageUrl, modelPersonaId, productContext,
         )
         results.aiEditorialShots = shots.images
         if (shots.errors.length) results.errors.push(...shots.errors)
@@ -160,6 +165,9 @@ async function generateAIEditorial(
   countPerColor: number,
   aiModelId: string | undefined,
   payload: any,
+  referenceImageUrl?: string,
+  modelPersonaId?: string,
+  productContext?: any,
 ): Promise<{ images: MockupImage[]; errors: string[] }> {
   const images: MockupImage[] = []
   const errors: string[] = []
@@ -175,7 +183,26 @@ async function generateAIEditorial(
   for (const color of effectiveColors) {
     for (let i = 0; i < countPerColor; i++) {
       const angle = ANGLES[i % ANGLES.length]
-      const prompt = buildModelPrompt(garmentType, color, angle, designTitle, category)
+      // E5: Enrich prompt with product context
+      let extraContext = ''
+      if (productContext) {
+        const parts: string[] = []
+        if (productContext.sizes?.length) parts.push(`Available sizes: ${productContext.sizes.join(', ')}`)
+        if (productContext.blueprintBrand) parts.push(`Brand: ${productContext.blueprintBrand}`)
+        if (productContext.printAreaFront) parts.push(`Print area: ${productContext.printAreaFront.width}×${productContext.printAreaFront.height}px`)
+        if (parts.length) extraContext = ` Product details: ${parts.join('. ')}.`
+      }
+      // E6: If model persona selected, resolve prompt description
+      let personaPrompt = ''
+      if (modelPersonaId) {
+        try {
+          const persona = await payload.findByID({ collection: 'ai-models' as any, id: modelPersonaId, depth: 0 })
+          if ((persona as any)?.promptDescription) {
+            personaPrompt = ` Model: ${(persona as any).promptDescription}.`
+          }
+        } catch { /* persona not found */ }
+      }
+      const prompt = buildModelPrompt(garmentType, color, angle, designTitle, category) + extraContext + personaPrompt
 
       try {
         payload.logger.info(`[Mockups] Generating ${color} shot ${i + 1}/${countPerColor} (${angle})...`)

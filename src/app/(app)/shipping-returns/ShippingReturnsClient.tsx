@@ -21,7 +21,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
       <div className="container max-w-3xl">
         {/* Section Header */}
         <header className="mb-16 md:mb-24">
-          <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+          <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
             {data.sectionLabel || 'INFO / 01'}
           </span>
           <h1
@@ -41,7 +41,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
           {/* Fulfillment */}
           {(data.show_howItWorks ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.howItWorks_title || 'How it works'}
               </h2>
@@ -56,7 +56,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
           {/* Shipping */}
           {(data.show_shippingTable ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.shippingTableTitle || 'Shipping times'}
               </h2>
@@ -95,7 +95,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
           {/* Returns */}
           {(data.show_returns ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.returns_title || 'Returns'}
               </h2>
@@ -110,7 +110,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
           {/* Exceptions */}
           {(data.show_noReturns ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.noReturnsTitle || 'What we don\u2019t take back'}
               </h2>
@@ -128,7 +128,7 @@ export function ShippingReturnsClient({ data: initialData }: Props) {
           {/* Damaged */}
           {(data.show_damaged ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.damaged_title || 'Damaged or wrong item'}
               </h2>

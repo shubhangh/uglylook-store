@@ -81,6 +81,17 @@ export const AISettings: GlobalConfig = {
     update: isAdmin,
   },
   fields: [
+    // ── Key Sharing Control (Owner only) ──
+    {
+      name: 'shareGlobalKeys',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Share global API keys with all team members',
+      admin: {
+        description: 'When OFF, only the owner can use global API keys. Other users must set their own personal keys in "My API Keys". Only the owner can change this setting.',
+      },
+    },
+
     // ── Global API Keys ──
     {
       type: 'collapsible',

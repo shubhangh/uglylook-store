@@ -112,13 +112,26 @@ export async function resolveApiKey(
       overrideAccess: true,
       context: { skipMask: true },
     } as any)
-    const globalKey = (settings as any)?.[keyField]
-    if (globalKey && isEncrypted(globalKey)) {
-      return decrypt(globalKey)
+
+    // Owner can control whether global keys are shared with other users
+    const shareGlobalKeys = (settings as any)?.shareGlobalKeys ?? true
+    let isUserOwner = false
+    if (userId) {
+      try {
+        const user = await payload.findByID({ collection: 'team', id: userId, depth: 0, overrideAccess: true } as any)
+        isUserOwner = (user as any)?.role === 'owner'
+      } catch { /* */ }
     }
-    // Handle non-encrypted keys (e.g., just stored as plain text initially)
-    if (globalKey && !isEncrypted(globalKey) && globalKey.length > 10) {
-      return globalKey
+
+    // Global keys available if: sharing is on, OR the user is the owner
+    if (shareGlobalKeys || isUserOwner) {
+      const globalKey = (settings as any)?.[keyField]
+      if (globalKey && isEncrypted(globalKey)) {
+        return decrypt(globalKey)
+      }
+      if (globalKey && !isEncrypted(globalKey) && globalKey.length > 10) {
+        return globalKey
+      }
     }
   } catch {
     // Global not found or no key
@@ -186,11 +199,17 @@ export async function getKeyStatus(
     }
 
     if (source === 'none') {
-      const gk = globalData?.[keyField]
-      if (gk && (isEncrypted(gk) || gk.length > 10)) {
-        source = 'global'
-        maskedKey = mask(gk)
-        label = globalData?.[labelField] || ''
+      // Check if global keys are shared (owner toggle)
+      const shareGlobalKeys = globalData?.shareGlobalKeys ?? true
+      const isUserOwner = userData?.role === 'owner'
+
+      if (shareGlobalKeys || isUserOwner) {
+        const gk = globalData?.[keyField]
+        if (gk && (isEncrypted(gk) || gk.length > 10)) {
+          source = 'global'
+          maskedKey = mask(gk)
+          label = globalData?.[labelField] || ''
+        }
       }
     }
 

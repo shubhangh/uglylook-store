@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+import { SelfFulfilledLauncher } from './SelfFulfilledLauncher'
 import './product-launcher.css'
 
 type SkuData = {
@@ -292,6 +293,11 @@ function MockupGenerator({
   colors,
   mockups,
   onMockupsGenerated,
+  modelPersonaId,
+  modelPersonaRef,
+  sizes,
+  blueprintBrand,
+  printAreaFront,
 }: {
   designId: string
   designUrl: string
@@ -302,14 +308,23 @@ function MockupGenerator({
   colors: string[]
   mockups: MockupImage[]
   onMockupsGenerated: (mockups: MockupImage[]) => void
+  modelPersonaId?: string
+  modelPersonaRef?: string
+  sizes?: string[]
+  blueprintBrand?: string
+  printAreaFront?: { width: number; height: number } | null
 }) {
   const [aiModels, setAiModels] = useState<Record<string, AIModelOption[]>>({})
   const [selectedModel, setSelectedModel] = useState('flux-2-pro')
   const [editorialCount, setEditorialCount] = useState(4)
   const [generating, setGenerating] = useState(false)
   const [progress, setProgress] = useState('')
+  const [progressLog, setProgressLog] = useState<string[]>([]) // E8: Real-time log messages
   const [error, setError] = useState<string | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  // E7: Ref-supported providers for default model selection
+  const REF_PROVIDERS = new Set(['gemini'])
 
   // Fetch available AI models on mount
   useEffect(() => {
@@ -318,18 +333,23 @@ function MockupGenerator({
       .then((data) => {
         if (data.models) {
           setAiModels(data.models)
-          // Find default model
-          for (const family of Object.values(data.models) as AIModelOption[][]) {
-            const def = family.find((m) => m.isDefault)
-            if (def) {
-              setSelectedModel(def.modelId)
-              break
+          const allFlat: AIModelOption[] = Object.values(data.models).flat() as AIModelOption[]
+          // E7: If persona has reference, default to image-supporting model (Gemini)
+          if (modelPersonaRef) {
+            const refModel = allFlat.find((m) => REF_PROVIDERS.has(m.provider))
+            if (refModel) {
+              setSelectedModel(refModel.modelId)
+              return
             }
           }
+          // Otherwise use default
+          const def = allFlat.find((m) => m.isDefault)
+          if (def) setSelectedModel(def.modelId)
+          else if (allFlat.length > 0) setSelectedModel(allFlat[0].modelId)
         }
       })
       .catch(() => {})
-  }, [])
+  }, [modelPersonaRef]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasDesign = !!(designId || designUrl)
 
@@ -359,6 +379,14 @@ function MockupGenerator({
           colors,
           aiModelId: selectedModel,
           editorialCount,
+          // E5+E6: Product context + model persona for AI consistency
+          modelPersonaId: modelPersonaId || undefined,
+          referenceImageUrl: modelPersonaRef || undefined,
+          productContext: {
+            sizes,
+            blueprintBrand,
+            printAreaFront,
+          },
         }),
       })
 
@@ -423,13 +451,17 @@ function MockupGenerator({
             disabled={generating}
           >
             {allModels.length > 0 ? (
-              allModels.map((m) => (
-                <option key={m.modelId} value={m.modelId}>
-                  {m.displayName}
-                  {m.costPerImage ? ` ($${m.costPerImage})` : ''}
-                  {m.tag ? ` [${m.tag}]` : ''}
-                </option>
-              ))
+              allModels.map((m) => {
+                const supportsRef = REF_PROVIDERS.has(m.provider)
+                return (
+                  <option key={m.modelId} value={m.modelId}>
+                    {m.displayName}
+                    {m.costPerImage ? ` ($${m.costPerImage})` : ''}
+                    {m.tag ? ` [${m.tag}]` : ''}
+                    {modelPersonaRef ? (supportsRef ? ' ✦ Ref' : ' (text only)') : ''}
+                  </option>
+                )
+              })
             ) : (
               <>
                 <option value="flux-2-pro">FLUX 2.0 Pro (Default)</option>
@@ -462,6 +494,13 @@ function MockupGenerator({
         </button>
       </div>
 
+      {/* E7: Warning when non-ref model selected with persona reference */}
+      {modelPersonaRef && !REF_PROVIDERS.has(allModels.find((m) => m.modelId === selectedModel)?.provider || '') && (
+        <div className="mockup-gen__warning">
+          Selected model doesn't support image input — persona reference photo won't be used. Switch to a Gemini model for image-to-image consistency.
+        </div>
+      )}
+
       {!hasDesign && (
         <div className="mockup-gen__hint">Pick a design above to generate mockups.</div>
       )}
@@ -476,8 +515,75 @@ function MockupGenerator({
         <div className="mockup-gen__progress">{progress}</div>
       )}
 
+      {/* E8: Real-time progress log */}
+      {generating && progressLog.length > 0 && (
+        <div className="mockup-gen__log">
+          {progressLog.slice(-5).map((line, i) => (
+            <div key={i} className="mockup-gen__log-line">{line}</div>
+          ))}
+        </div>
+      )}
+
       {error && (
         <div className="mockup-gen__error">{error}</div>
+      )}
+
+      {/* E9: Bulk actions + E11: Re-generate */}
+      {mockups.length > 0 && (
+        <div className="mockup-gen__bulk-bar">
+          <span className="mockup-gen__bulk-count">
+            {mockups.length} images · {mockups.filter((m) => m.approved === true).length} approved · {mockups.filter((m) => m.approved === false).length} rejected
+          </span>
+          <div className="mockup-gen__bulk-actions">
+            <button
+              className="mockup-gen__bulk-btn mockup-gen__bulk-btn--approve"
+              onClick={() => {
+                onMockupsGenerated(mockups.map((m) => m.approved === false ? m : { ...m, approved: true }))
+              }}
+              title="Approve all non-rejected"
+            >
+              Approve All
+            </button>
+            <button
+              className="mockup-gen__bulk-btn mockup-gen__bulk-btn--reject"
+              onClick={() => {
+                onMockupsGenerated(mockups.map((m) => m.approved === true ? m : { ...m, approved: false }))
+              }}
+              title="Reject all non-approved"
+            >
+              Reject Pending
+            </button>
+            <button
+              className="mockup-gen__bulk-btn"
+              onClick={() => {
+                mockups.forEach((m, i) => {
+                  if (m.url && m.approved !== false) {
+                    setTimeout(() => {
+                      const a = document.createElement('a')
+                      a.href = m.url
+                      a.download = `mockup-${i + 1}.jpg`
+                      a.target = '_blank'
+                      a.click()
+                    }, i * 200)
+                  }
+                })
+              }}
+              title="Download all non-rejected"
+            >
+              Download All
+            </button>
+            {/* E11: Re-generate — keep approved, generate more */}
+            {!generating && hasDesign && (
+              <button
+                className="mockup-gen__bulk-btn mockup-gen__bulk-btn--regen"
+                onClick={handleGenerate}
+                title="Generate more shots (approved images stay)"
+              >
+                + More Shots
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Preview generated mockups */}
@@ -580,6 +686,12 @@ function MockupGenerator({
   )
 }
 
+type PersonaOption = {
+  id: string
+  name: string
+  referenceImageUrl?: string
+}
+
 export const ProductLauncher: React.FC = () => {
   const [forms, setForms] = useState<ProductForm[]>([])
   const [launching, setLaunching] = useState(false)
@@ -588,6 +700,23 @@ export const ProductLauncher: React.FC = () => {
   const [generatingCopy, setGeneratingCopy] = useState<number | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
   const [pageSize, setPageSize] = useState(1)
+
+  // E6: Model persona for AI model shots
+  const [personas, setPersonas] = useState<PersonaOption[]>([])
+  const [selectedPersonaId, setSelectedPersonaId] = useState('')
+
+  useEffect(() => {
+    fetch('/api/ai-models?where[isActive][equals]=true&limit=50&sort=name&depth=2', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((data) => {
+        setPersonas((data.docs || []).map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          referenceImageUrl: d.referenceImages?.[0]?.image?.url || d.referenceImages?.[0]?.image || undefined,
+        })))
+      })
+      .catch(() => {})
+  }, [])
 
   // Load selected SKUs from sessionStorage (set by Catalog Browser)
   useEffect(() => {
@@ -714,6 +843,18 @@ export const ProductLauncher: React.FC = () => {
           blueprintTitle: `${form.sku.blueprintBrand} ${form.sku.blueprintTitle}`,
           blueprintImageUrl: form.sku.blueprintImages?.[0] || undefined,
           mockupMediaId,
+          // E4: Rich product context for AI copy generation
+          productContext: {
+            colors: form.colors,
+            sizes: form.sizes,
+            providerTitle: form.sku.providerTitle,
+            printAreaFront: form.sku.printAreaFront,
+            recommendedPrice: form.sku.targetRetail,
+            adminPrice: form.price,
+            podCost: form.sku.minCost,
+            shippingCost: form.sku.shippingCostUs,
+            variantCount: form.colors.length * form.sizes.length,
+          },
         }),
       })
 
@@ -752,11 +893,17 @@ export const ProductLauncher: React.FC = () => {
           category: f.sku.category,
           designId: f.designId || undefined,
           designUrl: f.designUrl || undefined,
-          galleryMediaIds: f.mockups.filter((m) => m.approved !== false).map((m) => m.mediaId).filter(Boolean),
+          galleryMediaIds: f.mockups.filter((m) => m.approved === true).map((m) => m.mediaId).filter(Boolean),
+          catalogMediaIds: f.mockups.filter((m) => m.source === 'printify' && m.approved !== false).map((m) => m.mediaId).filter(Boolean),
           colors: f.colors,
           sizes: f.sizes,
           placement: f.placement,
           publishStatus: f.publishStatus,
+          // E3: Rich product data for AI context
+          blueprintTitle: f.sku.blueprintTitle,
+          blueprintBrand: f.sku.blueprintBrand,
+          providerTitle: f.sku.providerTitle,
+          printAreaFront: f.sku.printAreaFront,
         })),
       }
 
@@ -782,15 +929,56 @@ export const ProductLauncher: React.FC = () => {
     }
   }
 
-  if (forms.length === 0 && !results) {
+  // Fulfillment type selector state
+  const [launchMode, setLaunchMode] = useState<'select' | 'self' | 'pod' | null>(
+    null, // null = not yet determined (will check sessionStorage)
+  )
+
+  // Determine initial mode: if SKUs are loaded, go straight to POD mode
+  useEffect(() => {
+    if (forms.length > 0) {
+      setLaunchMode('pod')
+    } else if (launchMode === null) {
+      setLaunchMode('select')
+    }
+  }, [forms.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Self-fulfilled mode
+  if (launchMode === 'self') {
+    return <SelfFulfilledLauncher onBack={() => setLaunchMode('select')} />
+  }
+
+  // Fulfillment type selector (no SKUs loaded, no results)
+  if ((launchMode === 'select' || forms.length === 0) && !results) {
     return (
       <div className="product-launcher">
         <div className="product-launcher__header">
           <h1>Product Launcher</h1>
         </div>
-        <div className="product-launcher__empty">
-          <p>No products selected for launch.</p>
-          <p>Go to <a href="/adm/collections/printify-catalog">Catalog Browser</a> to select SKUs, then click &quot;Launch Selected&quot;.</p>
+        <div className="product-launcher__mode-select">
+          <p className="product-launcher__mode-label">How is this product fulfilled?</p>
+          <div className="product-launcher__mode-cards">
+            <button
+              className="product-launcher__mode-card"
+              onClick={() => setLaunchMode('self')}
+            >
+              <span className="product-launcher__mode-icon">📦</span>
+              <strong>Self-Fulfilled</strong>
+              <span className="product-launcher__mode-desc">
+                You source, pack &amp; ship. Zines, limited drops, collabs, wholesale blanks.
+              </span>
+            </button>
+            <a
+              className="product-launcher__mode-card"
+              href="/adm/collections/printify-catalog"
+            >
+              <span className="product-launcher__mode-icon">🖨️</span>
+              <strong>Print on Demand</strong>
+              <span className="product-launcher__mode-desc">
+                Printify prints &amp; ships. Tees, hoodies, hats, totes. Browse catalog to select SKUs.
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -835,15 +1023,32 @@ export const ProductLauncher: React.FC = () => {
               </select>
             </div>
           )}
-          {!results && (
-            <button
-              className="product-launcher__btn product-launcher__btn--launch"
-              onClick={handleLaunch}
-              disabled={launching || forms.length === 0}
-            >
-              {launching ? 'Launching...' : `Launch All ${forms.length} Products`}
-            </button>
-          )}
+          {!results && (() => {
+            // E10: Check min 3 approved images per product
+            const productsWithEnoughImages = forms.filter((f) =>
+              f.mockups.filter((m) => m.approved === true).length >= 3
+            ).length
+            const allHaveEnough = productsWithEnoughImages === forms.length
+            const launchDisabled = launching || forms.length === 0 || !allHaveEnough
+
+            return (
+              <>
+                <button
+                  className="product-launcher__btn product-launcher__btn--launch"
+                  onClick={handleLaunch}
+                  disabled={launchDisabled}
+                  title={!allHaveEnough ? `Each product needs at least 3 approved images (${productsWithEnoughImages}/${forms.length} ready)` : ''}
+                >
+                  {launching ? 'Launching...' : `Launch All ${forms.length} Products`}
+                </button>
+                {!allHaveEnough && forms.length > 0 && (
+                  <span className="product-launcher__launch-hint">
+                    {productsWithEnoughImages}/{forms.length} products have 3+ approved images
+                  </span>
+                )}
+              </>
+            )
+          })()}
         </div>
       </div>
 
@@ -963,16 +1168,42 @@ export const ProductLauncher: React.FC = () => {
                 />
               </div>
 
-              {/* Price */}
-              <div className="launch-form__field launch-form__field--price">
-                <label>Retail Price (USD)</label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={(e) => updateForm(index, { price: Number(e.target.value) })}
-                  min={1}
-                  step={1}
-                />
+              {/* Pricing */}
+              <div className="launch-form__pricing">
+                <label className="launch-form__pricing-label">Pricing</label>
+
+                {/* Recommended price (read-only) */}
+                <div className="launch-form__pricing-rec">
+                  <span className="launch-form__pricing-rec-label">Recommended</span>
+                  <span className="launch-form__pricing-rec-value">${form.sku.targetRetail.toFixed(2)}</span>
+                  <span className="launch-form__pricing-rec-detail">
+                    POD ${form.sku.minCost.toFixed(2)} + Ship ${form.sku.shippingCostUs.toFixed(2)} + Stripe ${(form.sku.targetRetail * 0.029 + 0.3).toFixed(2)} = {form.sku.marginPercent}% margin
+                  </span>
+                </div>
+
+                {/* Admin-set price */}
+                <div className="launch-form__pricing-admin">
+                  <span className="launch-form__pricing-admin-label">Your Price</span>
+                  <div className="launch-form__pricing-input-row">
+                    <span className="launch-form__pricing-dollar">$</span>
+                    <input
+                      type="number"
+                      value={form.price}
+                      onChange={(e) => updateForm(index, { price: Number(e.target.value) })}
+                      min={1}
+                      step={1}
+                      placeholder={String(form.sku.targetRetail)}
+                    />
+                    <button
+                      type="button"
+                      className="launch-form__pricing-use-rec"
+                      onClick={() => updateForm(index, { price: form.sku.targetRetail })}
+                      title="Use recommended price"
+                    >
+                      Use Rec
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Design Picker */}
@@ -983,6 +1214,24 @@ export const ProductLauncher: React.FC = () => {
                 onManualUrl={(url) => updateForm(index, { designUrl: url, designId: '' })}
                 manualUrl={form.designUrl}
               />
+
+              {/* E6: Model Persona for AI shots */}
+              {personas.length > 0 && (
+                <div className="launch-form__field">
+                  <label>Model Persona (for AI shots)</label>
+                  <select
+                    value={selectedPersonaId}
+                    onChange={(e) => setSelectedPersonaId(e.target.value)}
+                  >
+                    <option value="">None — AI picks model</option>
+                    {personas.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}{p.referenceImageUrl ? ' ✦ Ref' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Mockup Generator */}
               <MockupGenerator
@@ -995,6 +1244,11 @@ export const ProductLauncher: React.FC = () => {
                 colors={form.colors}
                 mockups={form.mockups}
                 onMockupsGenerated={(mockups) => updateForm(index, { mockups })}
+                modelPersonaId={selectedPersonaId || undefined}
+                modelPersonaRef={personas.find((p) => p.id === selectedPersonaId)?.referenceImageUrl}
+                sizes={form.sizes}
+                blueprintBrand={form.sku.blueprintBrand}
+                printAreaFront={form.sku.printAreaFront}
               />
 
               {/* Colors */}
@@ -1058,8 +1312,49 @@ export const ProductLauncher: React.FC = () => {
               </div>
             </div>
 
-            {/* Sidebar — margin calc + placement */}
+            {/* Sidebar — product info + margin calc + placement */}
             <div className="launch-form__sidebar">
+              {/* Product info card (E3) */}
+              <div className="launch-form__product-info">
+                <h4>Product Info</h4>
+                <div className="product-info__rows">
+                  <div className="product-info__row">
+                    <span>Blueprint</span>
+                    <span>{form.sku.blueprintBrand} — {form.sku.blueprintTitle}</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Provider</span>
+                    <span>{form.sku.providerTitle} (#{form.sku.providerId})</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Category</span>
+                    <span>{form.sku.category}</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Print Area</span>
+                    <span>
+                      {form.sku.printAreaFront ? `Front: ${form.sku.printAreaFront.width}×${form.sku.printAreaFront.height}px` : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Colors</span>
+                    <span>{form.colors.length} selected</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Sizes</span>
+                    <span>{form.sizes.join(', ')}</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>Variants</span>
+                    <span>{form.colors.length * form.sizes.length} combos</span>
+                  </div>
+                  <div className="product-info__row">
+                    <span>IDs</span>
+                    <span>BP:{form.sku.blueprintId} / PV:{form.sku.providerId}</span>
+                  </div>
+                </div>
+              </div>
+
               <MarginCalc
                 retail={form.price}
                 podCost={form.sku.minCost}

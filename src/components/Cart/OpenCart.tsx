@@ -10,7 +10,7 @@ export function OpenCartButton({
 }) {
   return (
     <button
-      className="font-mono text-[13px] border border-input rounded-[4px] px-4 py-2.5 text-foreground bg-transparent cursor-pointer transition-colors hover:border-olive"
+      className="text-[13px] font-medium border border-input rounded-[4px] px-4 py-2.5 text-foreground bg-transparent cursor-pointer transition-colors hover:border-olive"
       aria-label={`Shopping bag, ${quantity || 0} items`}
       {...rest}
     >

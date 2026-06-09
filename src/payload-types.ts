@@ -88,12 +88,17 @@ export interface Config {
     offers: Offer;
     buckets: Bucket;
     'ai-graphics': AiGraphic;
+    'ai-models': AiModel;
     designs: Design;
+    photos: Photo;
+    'photo-presets': PhotoPreset;
+    'photo-studio': PhotoStudio;
     'printify-catalog': PrintifyCatalog;
     'printify-launcher': PrintifyLauncher;
     'printify-design-studio': PrintifyDesignStudio;
     'printify-analysis': PrintifyAnalysis;
     'printify-fulfillment': PrintifyFulfillment;
+    'fulfillment-queue': FulfillmentQueue;
     'design-presets': DesignPreset;
     'ai-model-registry': AiModelRegistry;
     'printify-catalog-cache': PrintifyCatalogCache;
@@ -103,6 +108,7 @@ export interface Config {
     'bulk-reads': BulkRead;
     'bulk-feedback': BulkFeedback;
     'ai-product-analysis-cache': AiProductAnalysisCache;
+    'workflow-guide': WorkflowGuide;
     addresses: Address;
     variants: Variant;
     variantTypes: VariantType;
@@ -147,12 +153,17 @@ export interface Config {
     offers: OffersSelect<false> | OffersSelect<true>;
     buckets: BucketsSelect<false> | BucketsSelect<true>;
     'ai-graphics': AiGraphicsSelect<false> | AiGraphicsSelect<true>;
+    'ai-models': AiModelsSelect<false> | AiModelsSelect<true>;
     designs: DesignsSelect<false> | DesignsSelect<true>;
+    photos: PhotosSelect<false> | PhotosSelect<true>;
+    'photo-presets': PhotoPresetsSelect<false> | PhotoPresetsSelect<true>;
+    'photo-studio': PhotoStudioSelect<false> | PhotoStudioSelect<true>;
     'printify-catalog': PrintifyCatalogSelect<false> | PrintifyCatalogSelect<true>;
     'printify-launcher': PrintifyLauncherSelect<false> | PrintifyLauncherSelect<true>;
     'printify-design-studio': PrintifyDesignStudioSelect<false> | PrintifyDesignStudioSelect<true>;
     'printify-analysis': PrintifyAnalysisSelect<false> | PrintifyAnalysisSelect<true>;
     'printify-fulfillment': PrintifyFulfillmentSelect<false> | PrintifyFulfillmentSelect<true>;
+    'fulfillment-queue': FulfillmentQueueSelect<false> | FulfillmentQueueSelect<true>;
     'design-presets': DesignPresetsSelect<false> | DesignPresetsSelect<true>;
     'ai-model-registry': AiModelRegistrySelect<false> | AiModelRegistrySelect<true>;
     'printify-catalog-cache': PrintifyCatalogCacheSelect<false> | PrintifyCatalogCacheSelect<true>;
@@ -162,6 +173,7 @@ export interface Config {
     'bulk-reads': BulkReadsSelect<false> | BulkReadsSelect<true>;
     'bulk-feedback': BulkFeedbackSelect<false> | BulkFeedbackSelect<true>;
     'ai-product-analysis-cache': AiProductAnalysisCacheSelect<false> | AiProductAnalysisCacheSelect<true>;
+    'workflow-guide': WorkflowGuideSelect<false> | WorkflowGuideSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
     variants: VariantsSelect<false> | VariantsSelect<true>;
     variantTypes: VariantTypesSelect<false> | VariantTypesSelect<true>;
@@ -196,6 +208,8 @@ export interface Config {
     sizeGuidePage: SizeGuidePage;
     privacyPage: PrivacyPage;
     termsPage: TermsPage;
+    aboutPage: AboutPage;
+    collectionsPage: CollectionsPage;
     'printify-defaults': PrintifyDefault;
     'ai-settings': AiSetting;
   };
@@ -213,6 +227,8 @@ export interface Config {
     sizeGuidePage: SizeGuidePageSelect<false> | SizeGuidePageSelect<true>;
     privacyPage: PrivacyPageSelect<false> | PrivacyPageSelect<true>;
     termsPage: TermsPageSelect<false> | TermsPageSelect<true>;
+    aboutPage: AboutPageSelect<false> | AboutPageSelect<true>;
+    collectionsPage: CollectionsPageSelect<false> | CollectionsPageSelect<true>;
     'printify-defaults': PrintifyDefaultsSelect<false> | PrintifyDefaultsSelect<true>;
     'ai-settings': AiSettingsSelect<false> | AiSettingsSelect<true>;
   };
@@ -445,6 +461,36 @@ export interface Order {
     | null;
   accessToken?: string | null;
   /**
+   * Stripe Checkout Session ID
+   */
+  stripeSessionId?: string | null;
+  /**
+   * Stripe Payment Intent ID
+   */
+  stripePaymentIntentId?: string | null;
+  /**
+   * Auto-set from product fulfillmentType. POD = Printify, Self = manual fulfillment.
+   */
+  fulfillmentSource?: ('pod' | 'self' | 'mixed') | null;
+  /**
+   * Manual fulfillment tracking — for self-fulfilled orders.
+   */
+  selfFulfillment?: {
+    /**
+     * When the order was packed and ready to ship.
+     */
+    packedAt?: string | null;
+    packedBy?: (string | null) | Team;
+    shippedAt?: string | null;
+    shippedBy?: (string | null) | Team;
+    deliveredAt?: string | null;
+    carrier?: ('usps' | 'ups' | 'fedex' | 'dhl' | 'other') | null;
+    /**
+     * Internal notes (packaging, special handling, etc.)
+     */
+    notes?: string | null;
+  };
+  /**
    * Printify order ID (auto-populated)
    */
   printifyOrderId?: string | null;
@@ -508,6 +554,10 @@ export interface Order {
 export interface Product {
   id: string;
   title: string;
+  /**
+   * The primary product image — used as the thumbnail in shop grids, carousels, cart, and social sharing. Pick the single best shot.
+   */
+  heroImage?: (string | null) | Media;
   description?: {
     root: {
       type: string;
@@ -552,6 +602,10 @@ export interface Product {
   };
   categories?: (string | Category)[] | null;
   /**
+   * How this product is produced and shipped. Self-fulfilled items bypass Printify entirely.
+   */
+  fulfillmentType?: ('pod' | 'self') | null;
+  /**
    * Admin-only grouping. Not visible to customers.
    */
   buckets?: (string | Bucket)[] | null;
@@ -574,6 +628,19 @@ export interface Product {
    * Linked design from the Design Library. Auto-populates printFile and designUrl.
    */
   design?: (string | null) | Design;
+  /**
+   * Raw catalog/mockup images (blank garment from Printify). Auto-populated by launcher.
+   */
+  catalogImages?:
+    | {
+        image: string | Media;
+        /**
+         * e.g. "Front", "Back", "Side"
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Print-ready design file (PNG, transparent bg). Sent to Printify for printing.
    */
@@ -846,6 +913,10 @@ export interface Category {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Cover image for collection cards on /collections page.
+   */
+  coverImage?: (string | null) | Media;
   /**
    * When off, this category is hidden from the shop, navigation, and sitemap. Use for internal categories like logos or design assets.
    */
@@ -1893,6 +1964,163 @@ export interface Offer {
   createdAt: string;
 }
 /**
+ * Reusable model personas for AI photo generation. Select these in Photo Studio for consistent results.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-models".
+ */
+export interface AiModel {
+  id: string;
+  /**
+   * Display name. e.g. "Arun", "Model A", "UL-M-01"
+   */
+  name: string;
+  gender: 'male' | 'female';
+  ethnicity?:
+    | (
+        | 'any'
+        | 'south-asian'
+        | 'east-asian'
+        | 'southeast-asian'
+        | 'black'
+        | 'white'
+        | 'latino'
+        | 'middle-eastern'
+        | 'mixed'
+      )
+    | null;
+  /**
+   * e.g. "22-26" or "24"
+   */
+  ageRange?: string | null;
+  /**
+   * Body description. e.g. "athletic-lean build, 5'11\"", "slim-athletic, 5'8\""
+   */
+  build?: string | null;
+  /**
+   * Hair + facial hair. e.g. "short black hair, clean-shaven", "shoulder-length brown hair"
+   */
+  hairStyle?: string | null;
+  /**
+   * Optional. e.g. "sharp jawline, light stubble", "high cheekbones, freckles"
+   */
+  distinguishingFeatures?: string | null;
+  /**
+   * Full prompt snippet for this model. Auto-generated from fields above, or hand-tune for better results. This exact text is injected into the image prompt.
+   */
+  promptDescription?: string | null;
+  /**
+   * Best generated images of this model. Phase 2: used as image-to-image reference for supported AI models.
+   */
+  referenceImages?:
+    | {
+        image: string | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Internal notes. Prompt tweaks that worked well, etc.
+   */
+  notes?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photos".
+ */
+export interface Photo {
+  id: string;
+  title: string;
+  /**
+   * The approved photo file (uploaded to R2).
+   */
+  imageFile: string | Media;
+  /**
+   * Auto-populated R2 URL after upload.
+   */
+  imageUrl?: string | null;
+  photoType: 'campaign-hero' | 'on-model' | 'flat-lay' | 'detail-texture' | 'editorial' | 'group-crew';
+  background?: ('near-black' | 'cream' | 'environment' | 'concrete' | 'custom') | null;
+  mood?: ('neutral' | 'dramatic' | 'editorial' | 'raw' | 'clinical') | null;
+  /**
+   * Which products appear in this photo.
+   */
+  products?: (string | Product)[] | null;
+  /**
+   * Which designs/prints are shown.
+   */
+  designs?: (string | Design)[] | null;
+  /**
+   * The prompt used to generate this image.
+   */
+  prompt?: string | null;
+  imageModel?: string | null;
+  imageModelDisplayName?: string | null;
+  promptModel?: string | null;
+  /**
+   * Cost in credits/dollars.
+   */
+  generationCost?: number | null;
+  generatedAt?: string | null;
+  generatedByUser?: (string | null) | Team;
+  status?: ('active' | 'draft' | 'archived') | null;
+  usageCount?: number | null;
+  /**
+   * Pin to top of library.
+   */
+  isPinned?: boolean | null;
+  /**
+   * Searchable tags.
+   */
+  tags?: string[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-presets".
+ */
+export interface PhotoPreset {
+  id: string;
+  name: string;
+  description?: string | null;
+  photoType: 'campaign-hero' | 'on-model' | 'flat-lay' | 'detail-texture' | 'editorial' | 'group-crew';
+  background?: ('near-black' | 'cream' | 'environment' | 'concrete') | null;
+  mood?: ('neutral' | 'dramatic' | 'editorial' | 'raw' | 'clinical') | null;
+  /**
+   * Claude/Gemini model for prompt generation.
+   */
+  promptModel?: (string | null) | AiModelRegistry;
+  detailLevel?: ('low' | 'medium' | 'high' | 'very-high') | null;
+  /**
+   * Base prompt template. Use {{product}}, {{design}}, {{color}} as placeholders. If provided, used as context for AI prompt generation.
+   */
+  promptTemplate?: string | null;
+  /**
+   * Default image generation model ID.
+   */
+  defaultImageModel?: string | null;
+  /**
+   * Show in preset picker.
+   */
+  isActive?: boolean | null;
+  timesUsed?: number | null;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-studio".
+ */
+export interface PhotoStudio {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "printify-catalog".
  */
@@ -1933,6 +2161,15 @@ export interface PrintifyAnalysis {
  * via the `definition` "printify-fulfillment".
  */
 export interface PrintifyFulfillment {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fulfillment-queue".
+ */
+export interface FulfillmentQueue {
   id: string;
   updatedAt: string;
   createdAt: string;
@@ -2180,6 +2417,15 @@ export interface AiProductAnalysisCache {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflow-guide".
+ */
+export interface WorkflowGuide {
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -2303,8 +2549,24 @@ export interface PayloadLockedDocument {
         value: string | AiGraphic;
       } | null)
     | ({
+        relationTo: 'ai-models';
+        value: string | AiModel;
+      } | null)
+    | ({
         relationTo: 'designs';
         value: string | Design;
+      } | null)
+    | ({
+        relationTo: 'photos';
+        value: string | Photo;
+      } | null)
+    | ({
+        relationTo: 'photo-presets';
+        value: string | PhotoPreset;
+      } | null)
+    | ({
+        relationTo: 'photo-studio';
+        value: string | PhotoStudio;
       } | null)
     | ({
         relationTo: 'printify-catalog';
@@ -2325,6 +2587,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'printify-fulfillment';
         value: string | PrintifyFulfillment;
+      } | null)
+    | ({
+        relationTo: 'fulfillment-queue';
+        value: string | FulfillmentQueue;
       } | null)
     | ({
         relationTo: 'design-presets';
@@ -2361,6 +2627,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'ai-product-analysis-cache';
         value: string | AiProductAnalysisCache;
+      } | null)
+    | ({
+        relationTo: 'workflow-guide';
+        value: string | WorkflowGuide;
       } | null)
     | ({
         relationTo: 'addresses';
@@ -2696,6 +2966,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   generateSlug?: T;
   slug?: T;
+  coverImage?: T;
   showOnStorefront?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2902,6 +3173,30 @@ export interface AiGraphicsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ai-models_select".
+ */
+export interface AiModelsSelect<T extends boolean = true> {
+  name?: T;
+  gender?: T;
+  ethnicity?: T;
+  ageRange?: T;
+  build?: T;
+  hairStyle?: T;
+  distinguishingFeatures?: T;
+  promptDescription?: T;
+  referenceImages?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  notes?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "designs_select".
  */
 export interface DesignsSelect<T extends boolean = true> {
@@ -2942,6 +3237,61 @@ export interface DesignsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photos_select".
+ */
+export interface PhotosSelect<T extends boolean = true> {
+  title?: T;
+  imageFile?: T;
+  imageUrl?: T;
+  photoType?: T;
+  background?: T;
+  mood?: T;
+  products?: T;
+  designs?: T;
+  prompt?: T;
+  imageModel?: T;
+  imageModelDisplayName?: T;
+  promptModel?: T;
+  generationCost?: T;
+  generatedAt?: T;
+  generatedByUser?: T;
+  status?: T;
+  usageCount?: T;
+  isPinned?: T;
+  tags?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-presets_select".
+ */
+export interface PhotoPresetsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  photoType?: T;
+  background?: T;
+  mood?: T;
+  promptModel?: T;
+  detailLevel?: T;
+  promptTemplate?: T;
+  defaultImageModel?: T;
+  isActive?: T;
+  timesUsed?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-studio_select".
+ */
+export interface PhotoStudioSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "printify-catalog_select".
  */
 export interface PrintifyCatalogSelect<T extends boolean = true> {
@@ -2977,6 +3327,14 @@ export interface PrintifyAnalysisSelect<T extends boolean = true> {
  * via the `definition` "printify-fulfillment_select".
  */
 export interface PrintifyFulfillmentSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fulfillment-queue_select".
+ */
+export interface FulfillmentQueueSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3153,6 +3511,14 @@ export interface AiProductAnalysisCacheSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflow-guide_select".
+ */
+export interface WorkflowGuideSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "addresses_select".
  */
 export interface AddressesSelect<T extends boolean = true> {
@@ -3219,6 +3585,7 @@ export interface VariantOptionsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
+  heroImage?: T;
   description?: T;
   gallery?:
     | T
@@ -3249,6 +3616,7 @@ export interface ProductsSelect<T extends boolean = true> {
         description?: T;
       };
   categories?: T;
+  fulfillmentType?: T;
   buckets?: T;
   generateSlug?: T;
   slug?: T;
@@ -3257,6 +3625,13 @@ export interface ProductsSelect<T extends boolean = true> {
   reviewNotes?: T;
   submittedForReviewAt?: T;
   design?: T;
+  catalogImages?:
+    | T
+    | {
+        image?: T;
+        label?: T;
+        id?: T;
+      };
   printFile?: T;
   printifyConfig?: T;
   updatedAt?: T;
@@ -3331,6 +3706,20 @@ export interface OrdersSelect<T extends boolean = true> {
         id?: T;
       };
   accessToken?: T;
+  stripeSessionId?: T;
+  stripePaymentIntentId?: T;
+  fulfillmentSource?: T;
+  selfFulfillment?:
+    | T
+    | {
+        packedAt?: T;
+        packedBy?: T;
+        shippedAt?: T;
+        shippedBy?: T;
+        deliveredAt?: T;
+        carrier?: T;
+        notes?: T;
+      };
   printifyOrderId?: T;
   fulfillmentStatus?: T;
   trackingNumber?: T;
@@ -3729,6 +4118,18 @@ export interface Homepage {
   metaImage?: (string | null) | Media;
   showFrameMarks?: boolean | null;
   showHero?: boolean | null;
+  /**
+   * Campaign hero image — model/editorial photo displayed alongside headline.
+   */
+  heroImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  heroImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  heroImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
   heroStamp?: string | null;
   heroClock?: string | null;
   heroFileLabel?: string | null;
@@ -3765,6 +4166,44 @@ export interface Homepage {
   pullQuoteText?: string | null;
   pullQuoteEmWord?: string | null;
   pullQuoteMetaRight?: string | null;
+  showFeaturedProducts?: boolean | null;
+  featuredHeading?: string | null;
+  featuredCtaText?: string | null;
+  featuredCtaUrl?: string | null;
+  /**
+   * Select up to 6 products to feature. Leave empty to auto-select newest.
+   */
+  featuredProducts?: (string | Product)[] | null;
+  /**
+   * How many seconds between slides. Set 0 to disable auto-slide.
+   */
+  heroCarouselSpeed?: number | null;
+  heroStampText?: string | null;
+  /**
+   * Rotation angle. Negative = tilt left, positive = tilt right. 0 = no tilt.
+   */
+  heroCarouselTilt?: number | null;
+  showBrandStatement?: boolean | null;
+  brandLede?: string | null;
+  brandEmWord?: string | null;
+  brandSpecs?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  brandWatermark?: string | null;
+  brandStamp1?: string | null;
+  brandStamp2?: string | null;
+  showImageCarousel?: boolean | null;
+  carouselLabelLeft?: string | null;
+  carouselLabelRight?: string | null;
+  /**
+   * Higher = slower. 40 is default. Set 0 to pause.
+   */
+  carouselSpeed?: number | null;
+  carouselSlideWidth?: number | null;
+  carouselSlideHeight?: number | null;
   showManifesto?: boolean | null;
   manifestoNumber?: string | null;
   manifestoTitle?: string | null;
@@ -3881,6 +4320,18 @@ export interface DropPage {
    * Social sharing image (1200×630 recommended).
    */
   metaImage?: (string | null) | Media;
+  /**
+   * Drop campaign hero image (optional).
+   */
+  heroImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  heroImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  heroImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
   showHeader?: boolean | null;
   sectionNumber?: string | null;
   heading?: string | null;
@@ -4041,6 +4492,18 @@ export interface SizeGuidePage {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Measurement diagram or product photo showing how to measure. Displayed alongside the size tables.
+   */
+  sizeGuideImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  sizeGuideImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  sizeGuideImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
   show_howToMeasure?: boolean | null;
   measureTitle?: string | null;
   measureChest?: string | null;
@@ -4114,6 +4577,106 @@ export interface TermsPage {
     | null;
   showFooterCta?: boolean | null;
   footerCtaText?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutPage".
+ */
+export interface AboutPage {
+  id: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200x630 recommended).
+   */
+  metaImage?: (string | null) | Media;
+  heading?: string | null;
+  subtext?: string | null;
+  /**
+   * Hero image — campaign/editorial photo (optional).
+   */
+  heroImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  heroImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  heroImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
+  showPhilosophy?: boolean | null;
+  showLanes?: boolean | null;
+  showSpecs?: boolean | null;
+  showRules?: boolean | null;
+  /**
+   * Editorial image between philosophy and lanes sections.
+   */
+  philosophyImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  philosophyImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  philosophyImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
+  /**
+   * Image for the quality & specs section.
+   */
+  specsImage?: (string | null) | Media;
+  /**
+   * Controls how wide the image renders on the page.
+   */
+  specsImageSize?: ('small' | 'medium' | 'large' | 'full') | null;
+  /**
+   * Controls the crop/aspect ratio of the image.
+   */
+  specsImageAspect?: ('auto' | 'square' | 'portrait' | 'landscape' | 'wide') | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collectionsPage".
+ */
+export interface CollectionsPage {
+  id: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  /**
+   * Social sharing image (1200x630 recommended).
+   */
+  metaImage?: (string | null) | Media;
+  heading?: string | null;
+  subtext?: string | null;
+  /**
+   * Select which categories to display and how each card looks. Leave empty to auto-show all storefront categories.
+   */
+  collections?:
+    | {
+        /**
+         * Pick from storefront-enabled categories.
+         */
+        category: string | Category;
+        /**
+         * Image: show a single thumbnail. Carousel: show top products' hero images.
+         */
+        displayMode?: ('image' | 'carousel') | null;
+        /**
+         * Custom thumbnail for this collection card. Overrides the category's cover image.
+         */
+        thumbnail?: (string | null) | Media;
+        /**
+         * Pick up to 5 products for the carousel. Leave empty to auto-use the latest 5 products in this category.
+         */
+        carouselProducts?: (string | Product)[] | null;
+        id?: string | null;
+      }[]
+    | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -4231,6 +4794,10 @@ export interface PrintifyDefault {
  */
 export interface AiSetting {
   id: string;
+  /**
+   * When OFF, only the owner can use global API keys. Other users must set their own personal keys in "My API Keys". Only the owner can change this setting.
+   */
+  shareGlobalKeys?: boolean | null;
   anthropicKeyLabel?: string | null;
   /**
    * For prompt engineering. Get from console.anthropic.com/settings/keys
@@ -4379,6 +4946,9 @@ export interface HomepageSelect<T extends boolean = true> {
   metaImage?: T;
   showFrameMarks?: T;
   showHero?: T;
+  heroImage?: T;
+  heroImageSize?: T;
+  heroImageAspect?: T;
   heroStamp?: T;
   heroClock?: T;
   heroFileLabel?: T;
@@ -4415,6 +4985,32 @@ export interface HomepageSelect<T extends boolean = true> {
   pullQuoteText?: T;
   pullQuoteEmWord?: T;
   pullQuoteMetaRight?: T;
+  showFeaturedProducts?: T;
+  featuredHeading?: T;
+  featuredCtaText?: T;
+  featuredCtaUrl?: T;
+  featuredProducts?: T;
+  heroCarouselSpeed?: T;
+  heroStampText?: T;
+  heroCarouselTilt?: T;
+  showBrandStatement?: T;
+  brandLede?: T;
+  brandEmWord?: T;
+  brandSpecs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  brandWatermark?: T;
+  brandStamp1?: T;
+  brandStamp2?: T;
+  showImageCarousel?: T;
+  carouselLabelLeft?: T;
+  carouselLabelRight?: T;
+  carouselSpeed?: T;
+  carouselSlideWidth?: T;
+  carouselSlideHeight?: T;
   showManifesto?: T;
   manifestoNumber?: T;
   manifestoTitle?: T;
@@ -4522,6 +5118,9 @@ export interface DropPageSelect<T extends boolean = true> {
   metaTitle?: T;
   metaDescription?: T;
   metaImage?: T;
+  heroImage?: T;
+  heroImageSize?: T;
+  heroImageAspect?: T;
   showHeader?: T;
   sectionNumber?: T;
   heading?: T;
@@ -4670,6 +5269,9 @@ export interface SizeGuidePageSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  sizeGuideImage?: T;
+  sizeGuideImageSize?: T;
+  sizeGuideImageAspect?: T;
   show_howToMeasure?: T;
   measureTitle?: T;
   measureChest?: T;
@@ -4744,6 +5346,58 @@ export interface TermsPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutPage_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
+  heading?: T;
+  subtext?: T;
+  heroImage?: T;
+  heroImageSize?: T;
+  heroImageAspect?: T;
+  showPhilosophy?: T;
+  showLanes?: T;
+  showSpecs?: T;
+  showRules?: T;
+  philosophyImage?: T;
+  philosophyImageSize?: T;
+  philosophyImageAspect?: T;
+  specsImage?: T;
+  specsImageSize?: T;
+  specsImageAspect?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collectionsPage_select".
+ */
+export interface CollectionsPageSelect<T extends boolean = true> {
+  metaTitle?: T;
+  metaDescription?: T;
+  metaImage?: T;
+  heading?: T;
+  subtext?: T;
+  collections?:
+    | T
+    | {
+        category?: T;
+        displayMode?: T;
+        thumbnail?: T;
+        carouselProducts?: T;
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "printify-defaults_select".
  */
 export interface PrintifyDefaultsSelect<T extends boolean = true> {
@@ -4790,6 +5444,7 @@ export interface PrintifyDefaultsSelect<T extends boolean = true> {
  * via the `definition` "ai-settings_select".
  */
 export interface AiSettingsSelect<T extends boolean = true> {
+  shareGlobalKeys?: T;
   anthropicKeyLabel?: T;
   anthropicKey?: T;
   bflKeyLabel?: T;

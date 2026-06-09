@@ -47,3 +47,9 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+@media (max-width: 600px) {
+  .tape { padding: 12px 0; }
+  .word, .wordHighlight { font-size: 20px; }
+  .wordHighlight { padding: 3px 12px; }
+}

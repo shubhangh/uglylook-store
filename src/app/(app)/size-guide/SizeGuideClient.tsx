@@ -2,6 +2,8 @@
 
 import { useLivePreview } from '@payloadcms/live-preview-react'
 import { getClientSideURL } from '@/utilities/getURL'
+import { Media } from '@/components/Media'
+import { getImageDisplayStyles } from '@/utilities/imageDisplay'
 import type { SizeGuidePage } from '@/payload-types'
 
 type Props = { data: SizeGuidePage }
@@ -19,7 +21,7 @@ function SizeTable({
 }) {
   return (
     <div>
-      <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+      <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
         <span className="w-[18px] h-px bg-olive inline-block" />
         {title}
       </h2>
@@ -77,7 +79,7 @@ export function SizeGuideClient({ data: initialData }: Props) {
       <div className="container max-w-3xl">
         {/* Section Header */}
         <header className="mb-16 md:mb-24">
-          <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+          <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
             {data.sectionLabel || 'INFO / 02'}
           </span>
           <h1
@@ -91,6 +93,22 @@ export function SizeGuideClient({ data: initialData }: Props) {
           </p>
         </header>
 
+        {/* Size Guide Image */}
+        {data.sizeGuideImage && typeof data.sizeGuideImage === 'object' && (() => {
+          const { containerClass, imageClass } = getImageDisplayStyles(
+            (data as any).sizeGuideImageSize,
+            (data as any).sizeGuideImageAspect,
+          )
+          return (
+            <div className={`mb-16 border border-border ${containerClass}`}>
+              <Media
+                resource={data.sizeGuideImage}
+                imgClassName={imageClass}
+              />
+            </div>
+          )
+        })()}
+
         <div className="space-y-16">
           {visibleTables.map((table) => (
             <SizeTable
@@ -103,7 +121,7 @@ export function SizeGuideClient({ data: initialData }: Props) {
           {/* How to measure */}
           {(data.show_howToMeasure ?? true) && (
             <div>
-              <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-6 flex items-center gap-2.5">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2.5">
                 <span className="w-[18px] h-px bg-olive inline-block" />
                 {data.measureTitle || 'How to measure'}
               </h2>
@@ -129,7 +147,7 @@ export function SizeGuideClient({ data: initialData }: Props) {
           {/* Fit note */}
           {(data.show_fitNote ?? true) && (
             <div className="bg-card rounded-lg border border-border p-6">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-3">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
                 {data.fitNoteLabel || 'Fit note'}
               </p>
               <p className="text-sm leading-relaxed text-foreground/70">

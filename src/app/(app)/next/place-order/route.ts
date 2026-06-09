@@ -1,8 +1,16 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers } from 'next/headers'
+import { sendOrderConfirmationEmail, sendCrewOrderAlert } from '@/lib/order-emails'
+import { rateLimit, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(req: Request): Promise<Response> {
+  const ip = getClientIP(req)
+  const { allowed } = rateLimit(`place-order:${ip}`, 5, 60_000)
+  if (!allowed) {
+    return Response.json({ error: 'Too many requests. Try again later.' }, { status: 429 })
+  }
+
   try {
     const payload = await getPayload({ config })
     const requestHeaders = await headers()
@@ -108,6 +116,14 @@ export async function POST(req: Request): Promise<Response> {
       return Response.json({ error: 'Order total is zero.' }, { status: 400 })
     }
 
+    // Determine fulfillment source from product types
+    const fulfillmentTypes = new Set(
+      resolvedItems.map(({ product }) => (product as any)?.fulfillmentType || 'pod'),
+    )
+    let fulfillmentSource: 'pod' | 'self' | 'mixed' = 'pod'
+    if (fulfillmentTypes.size > 1) fulfillmentSource = 'mixed'
+    else if (fulfillmentTypes.has('self')) fulfillmentSource = 'self'
+
     // Build shipping address — supports both old (name) and new (firstName/lastName) format
     let firstName = shipping.firstName || ''
     let lastName = shipping.lastName || ''
@@ -157,6 +173,7 @@ export async function POST(req: Request): Promise<Response> {
         shippingAddress,
         items: orderItems,
         transactions: [transaction.id],
+        fulfillmentSource,
       },
     })
 
@@ -176,6 +193,31 @@ export async function POST(req: Request): Promise<Response> {
         data: { purchasedAt: new Date().toISOString() },
       })
     }
+
+    // Send order emails (fire and forget)
+    const emailData = {
+      to: customerEmail,
+      orderId: order.id,
+      amount: totalAmount,
+      items: resolvedItems.map(({ product, variant, quantity }) => ({
+        title: product?.title || 'Product',
+        variant: variant?.title?.replace(`${product?.title} — `, '') || '',
+        quantity,
+        price: variant?.priceInUSD ?? product?.priceInUSD ?? 0,
+      })),
+      shipping: {
+        firstName,
+        lastName,
+        address: shippingAddress.addressLine1,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        zip: shippingAddress.postalCode,
+        country: shippingAddress.country,
+      },
+      paymentMethod: 'simulated' as const,
+    }
+    sendOrderConfirmationEmail(payload, emailData)
+    sendCrewOrderAlert(payload, emailData)
 
     return Response.json({
       success: true,

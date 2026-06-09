@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
 import { generateGlobalPreviewPath } from '@/utilities/generateGlobalPreviewPath'
 import { revalidateGlobal } from './hooks/revalidateGlobal'
+import { imageDisplayFields } from '@/fields/imageDisplay'
 
 // Helper to create a simple section with numbered paragraphs
 function textSection(name: string, label: string, defaultTitle: string, defaultContent: string) {
@@ -143,6 +144,13 @@ export const SizeGuideConfig: GlobalConfig = {
             },
           ],
         },
+      ],
+    },
+    {
+      type: 'collapsible', label: 'Size Guide Image', admin: { initCollapsed: true },
+      fields: [
+        { name: 'sizeGuideImage', type: 'upload' as const, relationTo: 'media' as const, admin: { description: 'Measurement diagram or product photo showing how to measure. Displayed alongside the size tables.' } },
+        ...imageDisplayFields('sizeGuideImage'),
       ],
     },
     {

@@ -296,3 +296,15 @@ button {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Collection card product carousel */
+@keyframes collection-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-collection-scroll {
+  animation: collection-scroll linear infinite;
+}
+.animate-collection-scroll:hover {
+  animation-play-state: paused;
+}

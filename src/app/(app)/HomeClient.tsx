@@ -6,14 +6,18 @@ import { FrameMarks } from '@/components/brand/frame-marks'
 import { HeroSection } from '@/components/brand/hero-section'
 import { MarqueeTape } from '@/components/brand/marquee-tape'
 import { PullQuote } from '@/components/brand/pull-quote'
-import { ManifestoSection } from '@/components/brand/manifesto-section'
-import { SpecSection } from '@/components/brand/spec-section'
-import { DropSection } from '@/components/brand/drop-section'
-import type { Homepage } from '@/payload-types'
+import { BrandStatement } from '@/components/brand/brand-statement'
+import { FeaturedProducts } from '@/components/brand/featured-products'
+import { ImageCarousel, type CarouselItem } from '@/components/brand/image-carousel'
+import type { Homepage, Product } from '@/payload-types'
 
-type Props = { data: Homepage }
+type Props = {
+  data: Homepage
+  featuredProducts: Product[]
+  carouselItems: CarouselItem[]
+}
 
-export function HomeClient({ data: initialData }: Props) {
+export function HomeClient({ data: initialData, featuredProducts, carouselItems }: Props) {
   const { data } = useLivePreview<Homepage>({
     initialData,
     serverURL: getClientSideURL(),
@@ -23,12 +27,14 @@ export function HomeClient({ data: initialData }: Props) {
   return (
     <>
       {(data.showFrameMarks ?? true) && <FrameMarks />}
-      {(data.showHero ?? true) && <HeroSection data={data} />}
+      {(data.showHero ?? true) && <HeroSection data={data} featuredProducts={featuredProducts} />}
       {(data.showMarquee ?? true) && <MarqueeTape data={data} />}
+      {(data.showFeaturedProducts ?? true) && (
+        <FeaturedProducts data={data} products={featuredProducts} />
+      )}
+      <BrandStatement data={data} />
       {(data.showPullQuote ?? true) && <PullQuote data={data} />}
-      {(data.showManifesto ?? true) && <ManifestoSection data={data} />}
-      {(data.showSpec ?? true) && <SpecSection data={data} />}
-      {(data.showDrop ?? true) && <DropSection data={data} />}
+      <ImageCarousel items={carouselItems} data={data} />
     </>
   )
 }

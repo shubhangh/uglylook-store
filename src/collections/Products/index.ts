@@ -82,6 +82,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     ...defaultCollection?.defaultPopulate,
     title: true,
     slug: true,
+    heroImage: true,
     variantOptions: true,
     variants: true,
     enableVariants: true,
@@ -89,9 +90,27 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     priceInUSD: true,
     inventory: true,
     meta: true,
+    fulfillmentType: true,
+    printifyConfig: true,
+    design: true,
+    printFile: true,
+    catalogImages: true,
   },
   fields: [
     { name: 'title', type: 'text', required: true },
+    {
+      // Hero image acts as the product's thumbnail — the single canonical image
+      // shown in shop grids, carousels, cart, checkout, OG tags, and anywhere
+      // the product appears as a card. The full gallery is only used on the
+      // product detail page (PDP). Admin picks this explicitly so the storefront
+      // image is always intentional, not just "whatever is first in the gallery."
+      name: 'heroImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'The primary product image — used as the thumbnail in shop grids, carousels, cart, and social sharing. Pick the single best shot.',
+      },
+    },
     {
       type: 'tabs',
       tabs: [
@@ -245,6 +264,19 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       relationTo: 'categories',
     },
     {
+      name: 'fulfillmentType',
+      type: 'select',
+      defaultValue: 'pod',
+      options: [
+        { label: 'Print on Demand (Printify)', value: 'pod' },
+        { label: 'Self-Fulfilled', value: 'self' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'How this product is produced and shipped. Self-fulfilled items bypass Printify entirely.',
+      },
+    },
+    {
       name: 'buckets',
       type: 'relationship',
       relationTo: 'buckets',
@@ -266,6 +298,31 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
         description: 'Linked design from the Design Library. Auto-populates printFile and designUrl.',
       },
     },
+    // ── Catalog / Raw Images ──
+    // Printify blueprint mockups (blank garment before design is applied).
+    // Auto-populated by Product Launcher when mockups are generated.
+    // Used by Photo Studio as reference for AI image consistency.
+    {
+      name: 'catalogImages',
+      type: 'array',
+      admin: {
+        description: 'Raw catalog/mockup images (blank garment from Printify). Auto-populated by launcher.',
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+        },
+        {
+          name: 'label',
+          type: 'text',
+          admin: { description: 'e.g. "Front", "Back", "Side"' },
+        },
+      ],
+    },
     // ── Printify Fulfillment ──
     {
       name: 'printFile',
@@ -274,6 +331,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       admin: {
         position: 'sidebar',
         description: 'Print-ready design file (PNG, transparent bg). Sent to Printify for printing.',
+        condition: (data) => data?.fulfillmentType !== 'self',
       },
     },
     {
@@ -282,6 +340,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       admin: {
         position: 'sidebar',
         description: 'Printify fulfillment config: blueprintId, providerId, designUrl, placement, variantMap. Auto-populated by Product Launcher or set manually.',
+        condition: (data) => data?.fulfillmentType !== 'self',
       },
     },
   ],

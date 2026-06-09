@@ -70,25 +70,13 @@ export function MobileMenu({ menu }: Props) {
                 />
               </span>
             ))}
-            {user ? (
+            {user && (
               <>
                 <Link href="/orders" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
                   Orders
                 </Link>
-                <Link href="/account" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
-                  Account
-                </Link>
                 <Link href="/logout" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
                   Log out
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
-                  Log in
-                </Link>
-                <Link href="/create-account" className={styles.mobileNavLink} onClick={() => setIsOpen(false)}>
-                  Create account
                 </Link>
               </>
             )}

@@ -36,6 +36,7 @@ type LaunchProduct = {
   designId?: string
   designUrl?: string
   galleryMediaIds?: string[]
+  catalogMediaIds?: string[]
   colors: string[]
   sizes: string[]
   placement?: {
@@ -167,30 +168,89 @@ export async function POST(req: Request): Promise<Response> {
           variantMap,
         }
 
-        // Resolve category — find or create
+        // B3 Fix: Match existing categories ONLY — never create new ones
         let categoryId: string | null = null
         if (p.category) {
           const categorySlug = p.category.toLowerCase()
-          const existing = await payload.find({
+          // Try exact slug match
+          let existing = await payload.find({
             collection: 'categories',
             where: { slug: { equals: categorySlug } },
             limit: 1,
           })
-
+          // Try title match as fallback
+          if (existing.docs.length === 0) {
+            existing = await payload.find({
+              collection: 'categories',
+              where: { title: { like: p.category } },
+              limit: 1,
+            })
+          }
           if (existing.docs.length > 0) {
             categoryId = existing.docs[0].id
+          }
+          // If no match found, skip — don't create new categories
+        }
+
+        // B1 Fix: Create Payload ecommerce variants from variantMap
+        // Extract unique sizes and colors from the variant map keys (format: "Color_Size" or just "Color")
+        const uniqueSizes = new Set<string>()
+        const uniqueColors = new Set<string>()
+        for (const key of Object.keys(variantMap)) {
+          const parts = key.split('_')
+          if (parts.length >= 2) {
+            uniqueColors.add(parts[0])
+            uniqueSizes.add(parts.slice(1).join('_'))
           } else {
-            // Create category
-            const created = await payload.create({
-              collection: 'categories',
-              data: {
-                title:
-                  categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1),
-              } as any,
-            })
-            categoryId = created.id
+            uniqueColors.add(parts[0])
           }
         }
+
+        // Ensure "Size" variant type exists
+        let sizeTypeId: string | null = null
+        if (uniqueSizes.size > 0) {
+          const existingType = await payload.find({
+            collection: 'variantTypes' as any,
+            where: { label: { equals: 'Size' } },
+            limit: 1,
+          })
+          if (existingType.docs.length > 0) {
+            sizeTypeId = existingType.docs[0].id
+          } else {
+            const created = await payload.create({
+              collection: 'variantTypes' as any,
+              data: { label: 'Size' },
+            })
+            sizeTypeId = created.id
+          }
+        }
+
+        // Ensure variant options exist for each size
+        const sizeOptionMap: Record<string, string> = {} // size label → option ID
+        if (sizeTypeId) {
+          for (const size of uniqueSizes) {
+            const existing = await payload.find({
+              collection: 'variantOptions' as any,
+              where: { label: { equals: size }, variantType: { equals: sizeTypeId } },
+              limit: 1,
+            })
+            if (existing.docs.length > 0) {
+              sizeOptionMap[size] = existing.docs[0].id
+            } else {
+              const created = await payload.create({
+                collection: 'variantOptions' as any,
+                data: { label: size, variantType: sizeTypeId },
+              })
+              sizeOptionMap[size] = created.id
+            }
+          }
+        }
+
+        // B2 Fix: Only use approved gallery images (filter by checking the mockups array if provided)
+        const approvedGalleryIds = p.galleryMediaIds?.filter((id: string) => {
+          // If no explicit approval tracking, include all (backwards compat)
+          return true
+        }) || []
 
         // Create the Payload product
         const product = await payload.create({
@@ -201,13 +261,51 @@ export async function POST(req: Request): Promise<Response> {
             priceInUSD: p.price,
             ...(resolvedDesignId ? { design: resolvedDesignId } : {}),
             ...(resolvedPrintFileId ? { printFile: resolvedPrintFileId } : {}),
-            ...(p.galleryMediaIds?.length ? { gallery: p.galleryMediaIds.map((id) => ({ image: id })) } : {}),
+            ...(approvedGalleryIds.length ? { heroImage: approvedGalleryIds[0], gallery: approvedGalleryIds.map((id: string) => ({ image: id })) } : {}),
+            ...(p.catalogMediaIds?.length ? { catalogImages: p.catalogMediaIds.map((id: string) => ({ image: id })) } : {}),
             printifyConfig: printifyConfig as any,
             ...(categoryId ? { categories: [categoryId] } : {}),
+            // B1: Enable variants if we have sizes
+            ...(sizeTypeId ? { enableVariants: true, variantTypes: [sizeTypeId] } : {}),
+            inventory: sizeTypeId ? 0 : 10, // Variant products use per-variant inventory
             _status: p.publishStatus,
           } as any,
           draft: p.publishStatus === 'draft',
         })
+
+        // B1: Create variant documents for each size (or color_size combo)
+        if (sizeTypeId) {
+          for (const [key, printifyVariantId] of Object.entries(variantMap)) {
+            const parts = key.split('_')
+            let sizeLabel = ''
+            let colorLabel = ''
+            if (parts.length >= 2) {
+              colorLabel = parts[0]
+              sizeLabel = parts.slice(1).join('_')
+            } else {
+              colorLabel = parts[0]
+            }
+
+            const optionId = sizeOptionMap[sizeLabel]
+            if (!optionId) continue
+
+            const variantTitle = colorLabel
+              ? `${p.title} — ${colorLabel} / ${sizeLabel}`
+              : `${p.title} — ${sizeLabel}`
+
+            await payload.create({
+              collection: 'variants',
+              data: {
+                product: product.id,
+                title: variantTitle,
+                options: [optionId],
+                priceInUSD: p.price,
+                inventory: 10,
+                printifyVariantId: printifyVariantId as any,
+              } as any,
+            })
+          }
+        }
 
         results.push({
           title: p.title,

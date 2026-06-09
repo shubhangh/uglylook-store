@@ -120,12 +120,8 @@ export async function POST(req: Request): Promise<Response> {
       let variantKey: string | null = null
       if (item.variant && typeof item.variant === 'object') {
         const variant = item.variant as any
-        // Try title-based key
-        if (variant.title) {
-          variantKey = variant.title.replace(/\s*\/\s*/g, '_').replace(/\s+/g, '_')
-        }
-        // Fallback: direct printifyVariantId on variant
-        if (!variantKey && variant.printifyVariantId) {
+        // Prefer direct printifyVariantId on variant (most reliable)
+        if (variant.printifyVariantId) {
           lineItems.push({
             blueprint_id: config.blueprintId,
             print_provider_id: config.providerId,
@@ -136,6 +132,10 @@ export async function POST(req: Request): Promise<Response> {
             },
           })
           continue
+        }
+        // Fallback: title-based key
+        if (variant.title) {
+          variantKey = variant.title.replace(/\s*\/\s*/g, '_').replace(/\s+/g, '_')
         }
       }
 

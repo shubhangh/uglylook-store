@@ -34,7 +34,7 @@ export function FaqClient({ data: initialData }: { data: FaqPage }) {
       <div className="container">
         {/* Section Header */}
         <header className="mb-16 md:mb-24 max-w-3xl">
-          <span className="font-mono text-[11px] tracking-widest text-olive-text uppercase">
+          <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             {data.sectionLabel || 'INFO / 03'}
           </span>
           <h1
@@ -83,7 +83,7 @@ export function FaqClient({ data: initialData }: { data: FaqPage }) {
               const visibleQuestions = (section.questions ?? []).filter((q) => q.visible ?? true)
               return (
                 <div key={section.id || sectionId} id={`faq-${sectionId}`} className="scroll-mt-24">
-                  <h2 className="font-mono text-[10px] uppercase tracking-widest text-olive-text mb-4 flex items-center gap-2.5">
+                  <h2 className="text-[10px] font-medium uppercase tracking-widest text-olive-text mb-4 flex items-center gap-2.5">
                     <span className="w-[18px] h-px bg-olive inline-block" />
                     {section.name}
                   </h2>

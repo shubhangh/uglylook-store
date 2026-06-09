@@ -25,6 +25,14 @@ export const Categories: CollectionConfig = {
       position: undefined,
     }),
     {
+      name: 'coverImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Cover image for collection cards on /collections page.',
+      },
+    },
+    {
       name: 'showOnStorefront',
       type: 'checkbox',
       defaultValue: true,

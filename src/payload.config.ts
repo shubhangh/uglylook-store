@@ -45,7 +45,12 @@ import { Designs } from '@/collections/Designs'
 import { AIGraphics } from '@/collections/AIGraphics'
 import { DesignPresets } from '@/collections/DesignPresets'
 import { AIModelRegistry } from '@/collections/AIModelRegistry'
+import { AIModels } from '@/collections/AIModels'
 import { PrintifyDesignStudio } from '@/collections/PrintifyDesignStudio'
+import { Photos } from '@/collections/Photos'
+import { PhotoPresets } from '@/collections/PhotoPresets'
+import { PhotoStudio } from '@/collections/PhotoStudio'
+import { FulfillmentQueue } from '@/collections/FulfillmentQueue'
 import { AnnouncementBar } from '@/globals/AnnouncementBar'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
@@ -56,6 +61,8 @@ import { DropPageConfig } from '@/globals/DropPageConfig'
 import { ContactPageConfig } from '@/globals/ContactPageConfig'
 import { FaqPageConfig } from '@/globals/FaqPageConfig'
 import { ShippingReturnsConfig, SizeGuideConfig, PrivacyConfig, TermsConfig } from '@/globals/InfoPageConfigs'
+import { AboutPageConfig } from '@/globals/AboutPageConfig'
+import { CollectionsPageConfig } from '@/globals/CollectionsPageConfig'
 import { PrintifyDefaults } from '@/globals/PrintifyDefaults'
 import { AISettings } from '@/globals/AISettings'
 import { resendAdapter } from '@payloadcms/email-resend'
@@ -82,6 +89,7 @@ export default buildConfig({
       providers: [
         '@/components/admin/PasswordToggle#PasswordToggle',
         '@/components/admin/RoleRestrictions#RoleRestrictions',
+        '@/components/admin/HeroImageSwap#HeroImageSwap',
       ],
     },
     avatar: {
@@ -102,7 +110,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname, 'app/(payload)/adm'),
     },
   },
-  collections: [Customers, Pages, Posts, Categories, Media, Team, GlobalKeys, MyKeys, Subscribers, Redirects, Coupons, Offers, Buckets, AIGraphics, Designs, PrintifyCatalog, PrintifyLauncher, PrintifyDesignStudio, PrintifyAnalysis, PrintifyFulfillment, DesignPresets, AIModelRegistry, PrintifyCatalogCache, PrintifySyncLog, R2Browser, BulkUploads, BulkReads, BulkFeedback, AIProductAnalysisCache, WorkflowGuide],
+  collections: [Customers, Pages, Posts, Categories, Media, Team, GlobalKeys, MyKeys, Subscribers, Redirects, Coupons, Offers, Buckets, AIGraphics, AIModels, Designs, Photos, PhotoPresets, PhotoStudio, PrintifyCatalog, PrintifyLauncher, PrintifyDesignStudio, PrintifyAnalysis, PrintifyFulfillment, FulfillmentQueue, DesignPresets, AIModelRegistry, PrintifyCatalogCache, PrintifySyncLog, R2Browser, BulkUploads, BulkReads, BulkFeedback, AIProductAnalysisCache, WorkflowGuide],
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
     connectOptions: {
@@ -167,6 +175,8 @@ export default buildConfig({
     SizeGuideConfig,
     PrivacyConfig,
     TermsConfig,
+    AboutPageConfig,
+    CollectionsPageConfig,
     PrintifyDefaults,
     AISettings,
   ],

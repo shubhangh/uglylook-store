@@ -74,7 +74,7 @@ export function RelatedProducts({ products }: Props) {
                     amount: product.priceInUSD!,
                     title: product.title,
                   }}
-                  media={product.meta?.image as Media}
+                  media={(product.heroImage && typeof product.heroImage === 'object' ? product.heroImage : product.meta?.image) as Media}
                 />
               </Link>
             </li>

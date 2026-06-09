@@ -848,3 +848,35 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Custom palette editing */
+.ds-tc-swatch--editable {
+  position: relative;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ds-tc-swatch-picker {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.ds-tc-swatch-hex {
+  width: 70px;
+  background: transparent;
+  border: none;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  text-align: center;
+  outline: none;
+  padding: 2px 0;
+}

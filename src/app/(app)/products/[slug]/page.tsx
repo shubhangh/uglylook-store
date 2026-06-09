@@ -32,7 +32,9 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
   const canIndex = product._status === 'published'
 
-  const seoImage = metaImage || (gallery.length ? (gallery[0]?.image as Media) : undefined)
+  // heroImage is the canonical thumbnail for OG/social; fall back to meta then gallery[0]
+  const heroImg = typeof product.heroImage === 'object' ? (product.heroImage as Media) : undefined
+  const seoImage = metaImage || heroImg || (gallery.length ? (gallery[0]?.image as Media) : undefined)
 
   return {
     description: product.meta?.description || '',
@@ -56,7 +58,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
       },
       index: canIndex,
     },
-    title: product.meta?.title || product.title,
+    title: product.meta?.title?.replace(/\s*[|—–-]\s*UglyLook$/i, '') || product.title,
   }
 }
 
@@ -66,7 +68,8 @@ export default async function ProductPage({ params }: Args) {
 
   if (!product) return notFound()
 
-  const gallery =
+  // Build gallery with heroImage as the first item
+  const rawGallery =
     product.gallery
       ?.filter((item) => typeof item.image === 'object')
       .map((item) => ({
@@ -74,7 +77,20 @@ export default async function ProductPage({ params }: Args) {
         image: item.image as Media,
       })) || []
 
+  // Prepend heroImage if it exists and isn't already the first gallery item
+  const heroImg = typeof product.heroImage === 'object' ? (product.heroImage as Media) : undefined
+  let gallery = rawGallery
+  if (heroImg) {
+    const heroAlreadyFirst = rawGallery.length > 0 && rawGallery[0].image.id === heroImg.id
+    if (!heroAlreadyFirst) {
+      // Remove heroImage from its current position (if in gallery) and prepend it
+      const filtered = rawGallery.filter((item) => item.image.id !== heroImg.id)
+      gallery = [{ image: heroImg, id: `hero-${heroImg.id}` } as any, ...filtered]
+    }
+  }
+
   const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
+  const seoImage = metaImage || heroImg || (gallery.length ? (gallery[0]?.image as Media) : undefined)
   const hasStock = product.enableVariants
     ? product?.variants?.docs?.some((variant) => {
         if (typeof variant !== 'object') return false
@@ -98,7 +114,7 @@ export default async function ProductPage({ params }: Args) {
     '@type': 'Product',
     name: product.title,
     description: product.description,
-    image: metaImage?.url,
+    image: seoImage?.url,
     url: `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/products/${product.slug}`,
     brand: { '@type': 'Brand', name: 'UglyLook' },
     ...((product as any).sku ? { sku: (product as any).sku } : {}),

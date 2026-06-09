@@ -24,11 +24,13 @@ import { BackfillHashButton as BackfillHashButton_b98fdf060d4980367c4f0f14674d99
 import { GlobalKeys as GlobalKeys_c08bac9fdef94f7c7cf8124c2e54e67b } from '@/components/GlobalKeys/index'
 import { MyKeys as MyKeys_780ddaae93d921bf506a18eccd200a24 } from '@/components/MyKeys/index'
 import { BucketActions as BucketActions_e84913471dd71315a368ea2c206fdde5 } from '@/components/Buckets/BucketActions'
+import { PhotoStudio as PhotoStudio_2bd24e87ca97a6c168a9710204ff1336 } from '@/components/PhotoStudio/index'
 import { CatalogBrowser as CatalogBrowser_7f34caa4f23a9d0b29b2ad77627760dc } from '@/components/printify/CatalogBrowser/index'
 import { ProductLauncher as ProductLauncher_3412f39c5f1e6e76fa473e9b3e1322f2 } from '@/components/printify/ProductLauncher/index'
 import { DesignStudio as DesignStudio_400ace4dac6b07b5e0314c4053b9d2c0 } from '@/components/printify/DesignStudio/index'
 import { SkuAnalysis as SkuAnalysis_218ac8279fc01c12c7c3abfa2c6a41c9 } from '@/components/printify/SkuAnalysis/index'
 import { FulfillmentDashboard as FulfillmentDashboard_ede4b7375b4c41f35ddc5249f0bf3745 } from '@/components/printify/FulfillmentDashboard/index'
+import { FulfillmentQueue as FulfillmentQueue_be181ba28782983c6d698cb89ae906af } from '@/components/FulfillmentQueue/index'
 import { R2Browser as R2Browser_77aea8c5f5c77bdf0514a609c901dede } from '@/components/R2Browser/index'
 import { BulkUpload as BulkUpload_cee36026061588df6cd822cdb8c73dd7 } from '@/components/BulkUpload/index'
 import { BulkReads as BulkReads_ace9ecabfab8d3eacc65ac367522c035 } from '@/components/BulkReads/index'
@@ -46,6 +48,7 @@ import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/c
 import { DashboardLink as DashboardLink_64b80235b70372ae407044329831077f } from '@/components/admin/DashboardLink'
 import { PasswordToggle as PasswordToggle_0281325a0a7e8123f6c50d495f1599b3 } from '@/components/admin/PasswordToggle'
 import { RoleRestrictions as RoleRestrictions_29cbc75d4c23cac44cb9d88819155166 } from '@/components/admin/RoleRestrictions'
+import { HeroImageSwap as HeroImageSwap_9517a0eb9822bbd1b0733fa05ddd4a4a } from '@/components/admin/HeroImageSwap'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -77,11 +80,13 @@ export const importMap = {
   "@/components/GlobalKeys/index#GlobalKeys": GlobalKeys_c08bac9fdef94f7c7cf8124c2e54e67b,
   "@/components/MyKeys/index#MyKeys": MyKeys_780ddaae93d921bf506a18eccd200a24,
   "@/components/Buckets/BucketActions#BucketActions": BucketActions_e84913471dd71315a368ea2c206fdde5,
+  "@/components/PhotoStudio/index#PhotoStudio": PhotoStudio_2bd24e87ca97a6c168a9710204ff1336,
   "@/components/printify/CatalogBrowser/index#CatalogBrowser": CatalogBrowser_7f34caa4f23a9d0b29b2ad77627760dc,
   "@/components/printify/ProductLauncher/index#ProductLauncher": ProductLauncher_3412f39c5f1e6e76fa473e9b3e1322f2,
   "@/components/printify/DesignStudio/index#DesignStudio": DesignStudio_400ace4dac6b07b5e0314c4053b9d2c0,
   "@/components/printify/SkuAnalysis/index#SkuAnalysis": SkuAnalysis_218ac8279fc01c12c7c3abfa2c6a41c9,
   "@/components/printify/FulfillmentDashboard/index#FulfillmentDashboard": FulfillmentDashboard_ede4b7375b4c41f35ddc5249f0bf3745,
+  "@/components/FulfillmentQueue/index#FulfillmentQueue": FulfillmentQueue_be181ba28782983c6d698cb89ae906af,
   "@/components/R2Browser/index#R2Browser": R2Browser_77aea8c5f5c77bdf0514a609c901dede,
   "@/components/BulkUpload/index#BulkUpload": BulkUpload_cee36026061588df6cd822cdb8c73dd7,
   "@/components/BulkReads/index#BulkReads": BulkReads_ace9ecabfab8d3eacc65ac367522c035,
@@ -99,6 +104,7 @@ export const importMap = {
   "@/components/admin/DashboardLink#DashboardLink": DashboardLink_64b80235b70372ae407044329831077f,
   "@/components/admin/PasswordToggle#PasswordToggle": PasswordToggle_0281325a0a7e8123f6c50d495f1599b3,
   "@/components/admin/RoleRestrictions#RoleRestrictions": RoleRestrictions_29cbc75d4c23cac44cb9d88819155166,
+  "@/components/admin/HeroImageSwap#HeroImageSwap": HeroImageSwap_9517a0eb9822bbd1b0733fa05ddd4a4a,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

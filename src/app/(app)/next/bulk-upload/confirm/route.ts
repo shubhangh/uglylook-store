@@ -287,6 +287,7 @@ export async function POST(request: Request): Promise<Response> {
           title: pm.title,
           slug: pm.slug,
           description: richText(pm.description),
+          heroImage: mediaIds[0] || null,
           gallery: mediaIds.map((id) => ({ image: id })),
           categories: [categoryMap[pm.category]],
           relatedProducts: [],

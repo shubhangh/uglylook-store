@@ -1,8 +1,7 @@
-import type { Category, Product, Variant } from '@/payload-types'
+import type { Category, Product } from '@/payload-types'
 
 import Link from 'next/link'
 import React from 'react'
-import clsx from 'clsx'
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
 
@@ -18,7 +17,7 @@ type Props = {
 }
 
 export const ProductGridItem: React.FC<Props> = ({ product, priority }) => {
-  const { gallery, priceInUSD, title } = product
+  const { heroImage, gallery, priceInUSD, title } = product
 
   let price = priceInUSD
 
@@ -36,8 +35,11 @@ export const ProductGridItem: React.FC<Props> = ({ product, priority }) => {
     }
   }
 
-  const image =
-    gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
+  // heroImage is the canonical thumbnail; fall back to gallery[0] for backwards compat
+  const resolvedHero = heroImage && typeof heroImage === 'object' ? heroImage : null
+  const galleryFallback =
+    gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : null
+  const image = resolvedHero || galleryFallback || false
 
   return (
     <Link
@@ -62,12 +64,12 @@ export const ProductGridItem: React.FC<Props> = ({ product, priority }) => {
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {isNew(product.createdAt) && (
-              <span className="font-mono text-[10px] uppercase tracking-widest bg-olive text-cream px-2 py-0.5 rounded-sm">
+              <span className="text-[10px] font-medium uppercase tracking-widest bg-olive text-cream px-2 py-0.5 rounded-sm">
                 New
               </span>
             )}
             {product.categories?.[0] && typeof product.categories[0] === 'object' && (
-              <span className="font-mono text-[10px] uppercase tracking-widest bg-background/70 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-sm border border-border/50">
+              <span className="text-[10px] font-medium uppercase tracking-widest bg-background/70 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-sm border border-border/50">
                 {(product.categories[0] as Category).title}
               </span>
             )}

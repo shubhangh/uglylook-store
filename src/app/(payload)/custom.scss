@@ -179,6 +179,85 @@ button[class*='primary'] {
   border: 0;
 }
 
+// ── Global icon fix: dark SVG icons invisible on dark admin theme ──
+// Payload's dark theme doesn't override stroke colors on many SVG icons.
+// This fixes ALL icon instances by making strokes inherit from parent color.
+// Scoped to `.icon` class (Payload's icon wrapper) to avoid affecting
+// other SVGs like logos, brand marks, or custom component illustrations.
+
+.icon {
+  path.stroke,
+  line.stroke,
+  polyline.stroke {
+    stroke: currentColor !important;
+  }
+}
+
+// Specific icon overrides for buttons that are too dark
+.live-preview-toggler,                          // preview eye icon
+.relationship--multi-value-label__drawer-toggler, // edit icon on relationship pills
+.relationship--single-value__drawer-toggler,      // edit icon on single relationships
+.close-modal-button,                              // modal close X
+.list-drawer__header-close,                       // drawer close X
+.doc-drawer__header-close,                        // doc edit drawer close X
+.drawer__close {                                  // drawer close (alt class)
+  .icon {
+    color: var(--theme-elevation-600, #aaa) !important;
+  }
+
+  &:hover .icon {
+    color: var(--theme-elevation-900, #eee) !important;
+  }
+}
+
+// Toolbar popup buttons (rich text editor + dropdowns)
+.toolbar-popup__dropdown {
+  .icon {
+    color: var(--theme-elevation-500, #888) !important;
+  }
+}
+
+// Preview dimension inputs — dark text on dark bg
+.live-preview-toolbar-controls__device-size {
+  input {
+    color: var(--theme-text, #f5f2ec) !important;
+    background: var(--theme-elevation-150, #222) !important;
+    border-color: var(--theme-elevation-300, #3d3d3d) !important;
+  }
+}
+
+// Media filenames in drawer lists — ensure readable on dark bg
+.list-drawer,
+.drawer {
+  .default-cell__first-cell,
+  .file,
+  .file__filename,
+  .cell-filename,
+  .upload-relationship-details__filename {
+    color: var(--theme-elevation-600, #aaa) !important;
+  }
+
+  .default-cell__first-cell:hover,
+  .file:hover {
+    color: var(--theme-elevation-800, #e5e5e5) !important;
+  }
+}
+
+// List drawers (media picker, relationship picker) — constrain width
+.list-drawer.drawer {
+  max-width: 780px !important;
+  width: 90vw !important;
+  margin-left: auto;
+}
+
+// Edit drawers — also constrain
+.edit-drawer.drawer,
+.drawer:has(.doc-drawer__content) {
+  max-width: 720px !important;
+  width: 85vw !important;
+  margin-left: auto;
+}
+
 // Fix bulk edit drawer — center content vertically
 // Only targets edit-many drawers (not side-panel drawers which need the close button as backdrop)
 .drawer:has(.edit-many__main) {

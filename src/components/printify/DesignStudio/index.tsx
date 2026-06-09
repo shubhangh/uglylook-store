@@ -450,10 +450,17 @@ export const DesignStudio: React.FC = () => {
   const [imageModelId, setImageModelId] = useState('') // primary/default model
   const [selectedImageModelIds, setSelectedImageModelIds] = useState<Set<string>>(new Set())
   const [modelProgress, setModelProgress] = useState<Record<string, { status: 'pending' | 'generating' | 'done' | 'error'; count: number; completed: number; error?: string }>>({})
+  const [generationLog, setGenerationLog] = useState<string[]>([])
 
   // Text Composition config (available for any design type)
   const [tcEnabled, setTcEnabled] = useState(false)
   const [tcPaletteId, setTcPaletteId] = useState('muted-chaos')
+  const [tcCustomColors, setTcCustomColors] = useState([
+    { hex: '#5A6242', name: 'Custom 1' },
+    { hex: '#D9D2C2', name: 'Custom 2' },
+    { hex: '#F5F2EC', name: 'Custom 3' },
+    { hex: '#111111', name: 'Custom 4' },
+  ])
   const [tcStyleId, setTcStyleId] = useState('wireframe-cluster')
   const [tcOrientation, setTcOrientation] = useState<'vertical' | 'horizontal' | 'square'>('vertical')
   const [tcHeroText, setTcHeroText] = useState('')
@@ -764,6 +771,7 @@ export const DesignStudio: React.FC = () => {
     setStep('generating')
     setLoading(true)
     setError(null)
+    setGenerationLog([])
 
     // Initialize per-model progress
     const initialProgress: typeof modelProgress = {}
@@ -785,6 +793,7 @@ export const DesignStudio: React.FC = () => {
       heroText: tcHeroText,
       subText: tcSubText || undefined,
       paletteId: tcPaletteId,
+      customColors: tcPaletteId === 'custom' ? tcCustomColors.map((c) => c.hex) : undefined,
       position: tcPosition,
       garmentColor: tcGarmentColor,
       heroFont: tcHeroFont !== 'Inter' ? tcHeroFont : undefined,
@@ -806,6 +815,16 @@ export const DesignStudio: React.FC = () => {
         ...prev,
         [modelId]: { ...prev[modelId], status: 'generating' },
       }))
+
+      // Log: model generation started
+      const modelName = (() => {
+        for (const versions of Object.values(imageModels)) {
+          const m = versions.find((v) => v.modelId === modelId)
+          if (m) return m.displayName
+        }
+        return modelId
+      })()
+      setGenerationLog((prev) => [...prev, `Generating ${prompts.length} images with ${modelName}...`])
 
       try {
         const res = await fetch('/next/design-generate', {
@@ -846,6 +865,13 @@ export const DesignStudio: React.FC = () => {
           [modelId]: { status: 'done', count: images.length, completed: images.length },
         }))
 
+        // Log: success + any API errors
+        setGenerationLog((prev) => [
+          ...prev,
+          `✓ ${modelName}: ${images.length} images in ${data.durationSeconds || '?'}s ($${(data.grandTotalCost || 0).toFixed(3)})`,
+          ...(data.errors || []).map((e: string) => `⚠ ${e}`),
+        ])
+
         return {
           modelId,
           images,
@@ -858,6 +884,7 @@ export const DesignStudio: React.FC = () => {
           ...prev,
           [modelId]: { ...prev[modelId], status: 'error', error: err.message },
         }))
+        setGenerationLog((prev) => [...prev, `✗ ${modelName}: ${err.message}`])
         return { modelId, images: [], cost: 0, duration: 0, rawGraphics: [], error: err.message }
       }
     }
@@ -1444,16 +1471,62 @@ export const DesignStudio: React.FC = () => {
                       {p.name}
                     </button>
                   ))}
+                  {/* Custom palette option */}
+                  <button
+                    className={`ds-tc-palette-btn ${tcPaletteId === 'custom' ? 'ds-tc-palette-btn--active' : ''}`}
+                    onClick={() => setTcPaletteId('custom')}
+                    type="button"
+                  >
+                    <span className="ds-tc-palette-dots">
+                      {tcCustomColors.slice(0, 3).map((c, i) => (
+                        <span key={i} className="ds-tc-palette-dot" style={{ backgroundColor: c.hex }} />
+                      ))}
+                    </span>
+                    Custom
+                  </button>
                 </div>
                 {/* Swatch preview */}
                 <div className="ds-tc-swatches">
-                  {GEN_Z_PALETTES.find((p) => p.id === tcPaletteId)?.colors.map((c) => (
-                    <div key={c.hex} className="ds-tc-swatch" style={{ backgroundColor: c.hex }}>
-                      <span className="ds-tc-swatch-label" style={{ color: isLightHex(c.hex) ? '#1a1a1a' : '#f0f0f0' }}>
-                        {c.name} {c.hex}
-                      </span>
-                    </div>
-                  ))}
+                  {tcPaletteId === 'custom' ? (
+                    tcCustomColors.map((c, i) => (
+                      <div key={i} className="ds-tc-swatch ds-tc-swatch--editable" style={{ backgroundColor: c.hex }}>
+                        <input
+                          type="color"
+                          value={c.hex}
+                          onChange={(e) => {
+                            const updated = [...tcCustomColors]
+                            updated[i] = { ...updated[i], hex: e.target.value }
+                            setTcCustomColors(updated)
+                          }}
+                          className="ds-tc-swatch-picker"
+                          title={`Edit color ${i + 1}`}
+                        />
+                        <input
+                          type="text"
+                          value={c.hex}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            if (/^#[0-9a-fA-F]{0,6}$/.test(val)) {
+                              const updated = [...tcCustomColors]
+                              updated[i] = { ...updated[i], hex: val }
+                              setTcCustomColors(updated)
+                            }
+                          }}
+                          className="ds-tc-swatch-hex"
+                          style={{ color: isLightHex(c.hex) ? '#1a1a1a' : '#f0f0f0' }}
+                          maxLength={7}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    GEN_Z_PALETTES.find((p) => p.id === tcPaletteId)?.colors.map((c) => (
+                      <div key={c.hex} className="ds-tc-swatch" style={{ backgroundColor: c.hex }}>
+                        <span className="ds-tc-swatch-label" style={{ color: isLightHex(c.hex) ? '#1a1a1a' : '#f0f0f0' }}>
+                          {c.name} {c.hex}
+                        </span>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -1866,6 +1939,25 @@ export const DesignStudio: React.FC = () => {
               )
             })}
           </div>
+
+          {/* Generation log */}
+          {generationLog.length > 0 && (
+            <div style={{
+              marginTop: 16, padding: '10px 14px', maxWidth: 500, width: '100%',
+              background: 'var(--theme-elevation-50, #141414)',
+              border: '1px solid var(--theme-elevation-200, #2a2a2a)',
+              borderRadius: 4, maxHeight: 160, overflowY: 'auto',
+            }}>
+              {generationLog.map((line, i) => (
+                <div key={i} style={{
+                  fontSize: 11, fontFamily: 'var(--font-mono, monospace)', lineHeight: 1.7,
+                  color: line.startsWith('✗') ? '#f87171' : line.startsWith('⚠') ? '#dcaa26' : line.startsWith('✓') ? '#8B9A6B' : '#888',
+                }}>
+                  {line}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

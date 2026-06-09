@@ -382,7 +382,9 @@ export const CheckoutPage: React.FC = () => {
 
               if (!quantity) return null
 
-              let image = gallery?.[0]?.image || meta?.image
+              // heroImage is the canonical thumbnail; fall back to gallery[0] then meta
+              const heroImg = product?.heroImage && typeof product.heroImage !== 'string' ? product.heroImage : null
+              let image = heroImg || gallery?.[0]?.image || meta?.image
               let price = product?.priceInUSD
 
               const isVariant = Boolean(variant) && typeof variant === 'object'

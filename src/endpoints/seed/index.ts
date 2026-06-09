@@ -625,6 +625,7 @@ export const seed = async ({
         title: def.title,
         slug: def.slug,
         description: richText(def.description),
+        heroImage: media.id,
         gallery: [{ image: media.id }],
         categories: [categoryMap[def.category].id],
         relatedProducts: [],
@@ -1182,6 +1183,25 @@ export const seed = async ({
   } catch (err) {
     payload.logger.warn('— Sample data seeding failed (non-critical, skipping):')
     payload.logger.warn(err)
+  }
+
+  // ── Photo Presets ──
+  payload.logger.info('— Seeding photo presets...')
+  const photoPresetDefaults = [
+    { name: 'Campaign Hero \u2014 Dark BG', photoType: 'campaign-hero', background: 'near-black', mood: 'neutral', detailLevel: 'high', defaultImageModel: 'flux-2-pro', promptTemplate: 'High-end fashion campaign photo. Gen Z model wearing UglyLook product prominently. Near-black #111 seamless studio background. Single soft directional light from upper-left. Neutral expression, direct camera gaze. Boxy dropped-shoulder fit visible. Shot on medium format, shallow depth of field.', isActive: true, timesUsed: 0 },
+    { name: 'Campaign Hero \u2014 Cream BG', photoType: 'campaign-hero', background: 'cream', mood: 'neutral', detailLevel: 'high', defaultImageModel: 'flux-2-pro', promptTemplate: 'Fashion campaign photo on warm cream #F5F2EC seamless background. Gen Z model wearing UglyLook product. Soft natural daylight feel. Neutral expression. Boxy oversized fit clearly visible. Clean minimal composition.', isActive: true, timesUsed: 0 },
+    { name: 'On-Model \u2014 Front View', photoType: 'on-model', background: 'near-black', mood: 'neutral', detailLevel: 'medium', defaultImageModel: 'flux-2-pro', promptTemplate: 'Product photography on model. Front-facing view. Near-black #111 background. Garment fills 65-75% of frame. Single soft directional light upper-left. Print/design legible. Boxy fit, dropped shoulder visible.', isActive: true, timesUsed: 0 },
+    { name: 'On-Model \u2014 Back View', photoType: 'on-model', background: 'near-black', mood: 'neutral', detailLevel: 'medium', defaultImageModel: 'flux-2-pro', promptTemplate: 'Product photography on model. Back-facing view showing rear of garment. Near-black #111 background. Back print or label visible. Single soft directional light upper-left.', isActive: true, timesUsed: 0 },
+    { name: 'Editorial \u2014 Parking Garage', photoType: 'editorial', background: 'environment', mood: 'editorial', detailLevel: 'high', defaultImageModel: 'flux-2-pro', promptTemplate: 'Fashion editorial in a fluorescent-lit parking garage. Harsh overhead fluorescent lighting, concrete pillars, yellow lane markings. Gen Z model wearing UglyLook oversized tee/hoodie. Deadpan expression, stiff posture. Shot on 35mm film, slight grain.', isActive: true, timesUsed: 0 },
+    { name: 'Detail \u2014 Fabric Texture', photoType: 'detail-texture', background: 'near-black', mood: 'raw', detailLevel: 'very-high', defaultImageModel: 'flux-2-pro', promptTemplate: 'Macro close-up product photography. Focus on 240gsm cotton fabric weave texture. Near-black background. Soft directional lighting. Shallow depth of field. Premium quality streetwear material detail.', isActive: true, timesUsed: 0 },
+  ]
+  for (const preset of photoPresetDefaults) {
+    try {
+      const existing = await payload.find({ collection: 'photo-presets' as any, where: { name: { equals: preset.name } }, limit: 1 })
+      if (existing.docs.length === 0) {
+        await payload.create({ collection: 'photo-presets' as any, data: preset as any })
+      }
+    } catch { /* skip if exists */ }
   }
 
   payload.logger.info('Seeded database successfully!')

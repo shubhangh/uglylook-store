@@ -61,6 +61,7 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
               resource={item.image}
               className="w-full h-full"
               imgClassName="w-full h-full object-cover rounded-lg"
+              priority={i === 0}
             />
           </div>
         ))}

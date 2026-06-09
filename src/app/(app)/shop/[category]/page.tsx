@@ -1,13 +1,11 @@
-import { Grid } from '@/components/Grid'
-import { ProductGridItem } from '@/components/ProductGridItem'
-import { ScrollFadeIn } from '@/components/ScrollFadeIn'
+import { ProductGrid } from '@/components/shop/ProductGrid'
+import { ShopControls } from '@/components/shop/ShopControls'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
-import React from 'react'
 import Link from 'next/link'
-
-import { Metadata } from 'next'
+import React from 'react'
+import type { Metadata } from 'next'
 
 type Args = {
   params: Promise<{ category: string }>
@@ -33,7 +31,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!cat) return { title: 'Shop' }
 
   return {
-    title: `${cat.title} — UglyLook`,
+    title: cat.title,
     description: `Shop ${cat.title} from UglyLook. Ugly is the new sick.`,
   }
 }
@@ -71,13 +69,22 @@ export default async function CategoryPage({ params, searchParams }: Args) {
   const category = categories.docs[0]
   if (!category) return notFound()
 
+  // Fetch all storefront categories for the filter bar
+  const allCategories = await payload.find({
+    collection: 'categories',
+    limit: 20,
+    sort: 'title',
+    where: { showOnStorefront: { equals: true } },
+  })
+
   const products = await payload.find({
     collection: 'products',
-    draft: false,
-    overrideAccess: false,
+    depth: 2,
+    limit: 12,
     select: {
       title: true,
       slug: true,
+      heroImage: true,
       gallery: true,
       categories: true,
       priceInUSD: true,
@@ -85,29 +92,22 @@ export default async function CategoryPage({ params, searchParams }: Args) {
     ...(sort ? { sort } : { sort: 'title' }),
     where: {
       and: [
+        { heroImage: { exists: true } },
         { _status: { equals: 'published' } },
         { categories: { contains: category.id } },
       ],
     },
   })
 
+  const sortValue = typeof sort === 'string' ? sort : 'title'
+
   return (
     <div>
-      <div className="mb-6 flex items-center gap-3">
-        <Link
-          href="/shop"
-          className="font-mono text-[11px] text-muted-foreground uppercase tracking-widest hover:text-foreground transition-colors"
-        >
-          All
-        </Link>
-        <span className="text-muted-foreground/40">/</span>
-        <span className="font-mono text-[11px] text-foreground uppercase tracking-widest">
-          {category.title}
-        </span>
-        <span className="ml-auto font-mono text-[11px] text-muted-foreground">
-          {products.docs.length} {products.docs.length === 1 ? 'piece' : 'pieces'}
-        </span>
-      </div>
+      <ShopControls categories={allCategories.docs} activeCategory={categorySlug} />
+
+      <p className="mb-6 text-[11px] font-medium text-muted-foreground uppercase tracking-widest">
+        {products.totalDocs} {products.totalDocs === 1 ? 'piece' : 'pieces'}
+      </p>
 
       {products.docs.length === 0 && (
         <div className="text-center py-16">
@@ -122,13 +122,12 @@ export default async function CategoryPage({ params, searchParams }: Args) {
       )}
 
       {products.docs.length > 0 && (
-        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.docs.map((product, i) => (
-            <ScrollFadeIn key={product.id} delay={i * 60}>
-              <ProductGridItem product={product} priority={i < 4} />
-            </ScrollFadeIn>
-          ))}
-        </Grid>
+        <ProductGrid
+          initialProducts={products.docs}
+          totalDocs={products.totalDocs}
+          sort={sortValue}
+          category={categorySlug}
+        />
       )}
     </div>
   )

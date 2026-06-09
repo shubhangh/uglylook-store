@@ -29,10 +29,13 @@ export const ProductItem: React.FC<Props> = ({
   const metaImage =
     product.meta?.image && typeof product.meta?.image !== 'string' ? product.meta.image : undefined
 
+  // heroImage is the canonical thumbnail; fall back to gallery[0] then meta image
+  const resolvedHero =
+    product.heroImage && typeof product.heroImage !== 'string' ? product.heroImage : undefined
   const firstGalleryImage =
     typeof product.gallery?.[0]?.image !== 'string' ? product.gallery?.[0]?.image : undefined
 
-  let image = firstGalleryImage || metaImage
+  let image = resolvedHero || firstGalleryImage || metaImage
 
   const isVariant = Boolean(variant) && typeof variant === 'object'
 

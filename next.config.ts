@@ -34,18 +34,28 @@ const nextConfig: NextConfig = {
           protocol: url.protocol.replace(':', '') as 'http' | 'https',
         }
       }),
-      // Cloudflare R2 public URL
-      ...(process.env.R2_PUBLIC_URL
-        ? [
-            {
-              hostname: new URL(process.env.R2_PUBLIC_URL).hostname,
-              protocol: 'https' as const,
-            },
-          ]
-        : []),
+      // Cloudflare R2 custom domain (CDN-cached)
+      {
+        hostname: 'media.uglylook.com',
+        protocol: 'https' as const,
+      },
     ],
+    minimumCacheTTL: 31536000, // Cache optimized images for 1 year (R2 URLs are immutable)
   },
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
+  },
   redirects,
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

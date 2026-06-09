@@ -77,12 +77,17 @@ export function CartModal() {
                       ? product.meta.image
                       : undefined
 
+                  // heroImage is the canonical thumbnail; fall back to gallery[0] then meta
+                  const resolvedHero =
+                    product.heroImage && typeof product.heroImage === 'object'
+                      ? product.heroImage
+                      : undefined
                   const firstGalleryImage =
                     typeof product.gallery?.[0]?.image === 'object'
                       ? product.gallery?.[0]?.image
                       : undefined
 
-                  let image = firstGalleryImage || metaImage
+                  let image = resolvedHero || firstGalleryImage || metaImage
                   let price = product.priceInUSD
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'

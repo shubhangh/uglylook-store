@@ -64,6 +64,7 @@ export async function generateImages(
   modelId: string,
   userId: string | null,
   payload: Payload,
+  referenceImageUrl?: string,
 ): Promise<GenerationResult> {
   const startTime = Date.now()
   const errors: string[] = []
@@ -128,10 +129,10 @@ export async function generateImages(
           ;({ base64, mimeType } = await generateWithFlux(prompts[i], modelId, apiKey))
           break
         case 'gemini':
-          ;({ base64, mimeType } = await generateWithGemini(prompts[i], modelId, apiKey))
+          ;({ base64, mimeType } = await generateWithGemini(prompts[i], modelId, apiKey, referenceImageUrl))
           break
         case 'openai':
-          ;({ base64, mimeType } = await generateWithOpenAI(prompts[i], apiKey))
+          ;({ base64, mimeType } = await generateWithOpenAI(prompts[i], apiKey, referenceImageUrl))
           break
         default:
           throw new Error(`Unsupported provider: ${provider}`)
@@ -260,8 +261,33 @@ async function generateWithGemini(
   prompt: string,
   modelId: string,
   apiKey: string,
+  referenceImageUrl?: string,
 ): Promise<{ base64: string; mimeType: string }> {
   const model = modelId || 'gemini-2.5-flash-image'
+
+  // Build parts — text prompt + optional reference image
+  const parts: any[] = []
+  if (referenceImageUrl) {
+    try {
+      const imgRes = await fetch(referenceImageUrl)
+      if (imgRes.ok) {
+        const buffer = Buffer.from(await imgRes.arrayBuffer())
+        const mime = imgRes.headers.get('content-type') || 'image/png'
+        parts.push({
+          inlineData: { mimeType: mime, data: buffer.toString('base64') },
+        })
+        parts.push({
+          text: `REFERENCE IMAGE: The person in this reference image is the model. Generate a NEW photo of this SAME person (same face, same body, same skin tone, same hair) in the pose/angle described below. The model must look identical to the reference.\n\n${prompt}`,
+        })
+      } else {
+        parts.push({ text: prompt })
+      }
+    } catch {
+      parts.push({ text: prompt })
+    }
+  } else {
+    parts.push({ text: prompt })
+  }
 
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -269,7 +295,7 @@ async function generateWithGemini(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{ parts }],
         generationConfig: {
           responseModalities: ['TEXT', 'IMAGE'],
         },
@@ -285,8 +311,8 @@ async function generateWithGemini(
   const data = await res.json()
 
   // Find image part in response
-  const parts = data.candidates?.[0]?.content?.parts || []
-  const imagePart = parts.find(
+  const responseParts = data.candidates?.[0]?.content?.parts || []
+  const imagePart = responseParts.find(
     (p: any) => p.inlineData?.mimeType?.startsWith('image/'),
   )
 
@@ -305,7 +331,14 @@ async function generateWithGemini(
 async function generateWithOpenAI(
   prompt: string,
   apiKey: string,
+  referenceImageUrl?: string,
 ): Promise<{ base64: string; mimeType: string }> {
+  // GPT Image 1 doesn't support image input via generations endpoint.
+  // If reference provided, prepend a strong consistency instruction to the text prompt.
+  const effectivePrompt = referenceImageUrl
+    ? `IMPORTANT: Generate an image of a model who looks IDENTICAL to the person in this reference photo: ${referenceImageUrl}. Same face, same skin tone, same hair, same body type. The model must be recognizably the same person.\n\n${prompt}`
+    : prompt
+
   const res = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -314,7 +347,7 @@ async function generateWithOpenAI(
     },
     body: JSON.stringify({
       model: 'gpt-image-1',
-      prompt,
+      prompt: effectivePrompt,
       n: 1,
       size: '1024x1024',
       output_format: 'png',

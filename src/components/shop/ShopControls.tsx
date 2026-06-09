@@ -21,11 +21,11 @@ export function ShopControls({ categories, activeCategory }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between md:mb-8">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
         <Link
           href="/shop"
-          className={`font-mono text-[11px] uppercase tracking-widest px-3 py-1.5 rounded-full border transition-colors ${
+          className={`text-[11px] font-medium uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${
             !activeCategory
               ? 'border-foreground text-foreground bg-foreground/5'
               : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground'
@@ -37,7 +37,7 @@ export function ShopControls({ categories, activeCategory }: Props) {
           <Link
             key={cat.id}
             href={`/shop/${cat.slug}`}
-            className={`font-mono text-[11px] uppercase tracking-widest px-3 py-1.5 rounded-full border transition-colors ${
+            className={`text-[11px] font-medium uppercase tracking-wide px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap ${
               activeCategory === cat.slug
                 ? 'border-foreground text-foreground bg-foreground/5'
                 : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground'
@@ -51,13 +51,13 @@ export function ShopControls({ categories, activeCategory }: Props) {
       <select
         value={currentSort}
         onChange={(e) => handleSort(e.target.value)}
-        className="font-mono text-[11px] uppercase tracking-widest bg-transparent border border-border rounded-[4px] px-3 py-2 text-muted-foreground focus:text-foreground focus:border-foreground outline-none cursor-pointer"
+        className="text-[11px] font-medium uppercase tracking-wide bg-transparent border border-border rounded-[4px] px-3 py-2 text-muted-foreground focus:text-foreground focus:border-foreground outline-none cursor-pointer"
       >
-        <option value="title">A–Z</option>
-        <option value="-title">Z–A</option>
-        <option value="-createdAt">Newest</option>
-        <option value="priceInUSD">Price: Low–High</option>
-        <option value="-priceInUSD">Price: High–Low</option>
+        <option value="title" className="bg-background text-foreground">A–Z</option>
+        <option value="-title" className="bg-background text-foreground">Z–A</option>
+        <option value="-createdAt" className="bg-background text-foreground">Newest</option>
+        <option value="priceInUSD" className="bg-background text-foreground">Price: Low–High</option>
+        <option value="-priceInUSD" className="bg-background text-foreground">Price: High–Low</option>
       </select>
     </div>
   )

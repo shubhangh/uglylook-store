@@ -8,7 +8,18 @@ import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import type { Product } from '@/payload-types'
+import type { Product, Variant, Media as MediaType } from '@/payload-types'
+
+interface CartItem {
+  product: string | Product
+  variant?: string | Variant | null
+  quantity?: number
+}
+
+interface VariantOption {
+  id: string
+  label: string
+}
 
 export function SimulatedCheckout() {
   const { user } = useAuth()
@@ -128,6 +139,81 @@ export function SimulatedCheckout() {
     } catch { /* ignore */ }
   }
 
+  const handleStripeCheckout = async () => {
+    if (!validateForm()) return
+    setIsProcessing(true)
+    setOrderError('')
+
+    try {
+      // Build items for Stripe
+      const stripeItems = cart?.items?.map((item: CartItem) => {
+        const product = typeof item.product === 'object' ? (item.product as Product) : null
+        const variant = item.variant && typeof item.variant === 'object' ? (item.variant as Variant) : null
+        if (!product) return null
+
+        const heroImg = product.heroImage && typeof product.heroImage === 'object' ? product.heroImage : null
+        const galleryImg = product.gallery?.[0]?.image && typeof product.gallery[0].image === 'object' ? product.gallery[0].image : null
+        const image = heroImg || galleryImg
+
+        const optionLabels = variant?.options
+          ?.map((o: string | VariantOption) => typeof o === 'object' ? o.label : '')
+          .filter(Boolean)
+          .join(', ') || ''
+
+        return {
+          productId: product.id,
+          variantId: variant?.id || null,
+          quantity: item.quantity || 1,
+          title: variant ? `${product.title} — ${optionLabels}` : product.title,
+          price: variant?.priceInUSD ?? product.priceInUSD ?? 0,
+          variantLabel: optionLabels,
+          imageUrl: (image as MediaType | null)?.url || '',
+        }
+      }).filter(Boolean) || []
+
+      if (stripeItems.length === 0) {
+        setOrderError('Cart is empty.')
+        setIsProcessing(false)
+        return
+      }
+
+      const res = await fetch('/next/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          items: stripeItems,
+          shipping: {
+            firstName: shipping.firstName,
+            lastName: shipping.lastName,
+            address: shipping.address,
+            city: shipping.city,
+            state: shipping.state,
+            zip: shipping.zip,
+            country: shipping.country,
+            phone: shipping.phone,
+          },
+          email: shipping.email,
+          cartId: (cart as Record<string, unknown>)?.id || null,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.url) {
+        setOrderError(data.error || 'Failed to create checkout session.')
+        setIsProcessing(false)
+        return
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url
+    } catch {
+      setOrderError('Connection failed. Try again.')
+      setIsProcessing(false)
+    }
+  }
+
   const handlePlaceOrder = async () => {
     if (!validateForm()) return
     setIsProcessing(true)
@@ -139,10 +225,10 @@ export function SimulatedCheckout() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          cartId: (cart as any)?.id || null,
-          items: cart?.items?.map((item: any) => ({
-            product: typeof item.product === 'object' ? item.product.id : item.product,
-            variant: item.variant ? (typeof item.variant === 'object' ? item.variant.id : item.variant) : null,
+          cartId: (cart as Record<string, unknown>)?.id || null,
+          items: cart?.items?.map((item: CartItem) => ({
+            product: typeof item.product === 'object' ? (item.product as Product).id : item.product,
+            variant: item.variant ? (typeof item.variant === 'object' ? (item.variant as Variant).id : item.variant) : null,
             quantity: item.quantity || 1,
           })),
           shipping,
@@ -334,22 +420,13 @@ export function SimulatedCheckout() {
           </div>
         </section>
 
-        {/* Payment simulation */}
+        {/* Payment */}
         <section>
           <h2 className="font-mono text-xs text-muted-foreground tracking-[0.1em] uppercase mb-4 flex items-center gap-2.5">
             <span className="w-[18px] h-px bg-olive inline-block" />
             03. Payment
           </h2>
           <div className="bg-card rounded-lg p-5 border border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 rounded-full bg-olive animate-pulse" />
-              <p className="font-mono text-xs text-muted-foreground uppercase tracking-[0.08em]">
-                Demo mode — no real charges
-              </p>
-            </div>
-            <p className="text-sm text-muted-foreground mb-6">
-              Payment is simulated. Click below to complete the order.
-            </p>
             {orderError && (
               <div className="mb-4 p-3 rounded-md bg-red-500/10 border border-red-500/20">
                 <p className="text-sm text-red-400">{orderError}</p>
@@ -360,13 +437,45 @@ export function SimulatedCheckout() {
                 <div className="h-full bg-olive animate-pulse rounded-full" style={{ width: '100%', animation: 'pulse 1s ease-in-out infinite' }} />
               </div>
             )}
-            <Button
-              onClick={handlePlaceOrder}
-              disabled={isProcessing}
-              className="w-full"
-            >
-              {isProcessing ? 'Processing...' : 'Place order'}
-            </Button>
+
+            {/* Stripe Checkout */}
+            {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+              <Button
+                onClick={handleStripeCheckout}
+                disabled={isProcessing}
+                className="w-full mb-3"
+              >
+                {isProcessing ? 'Redirecting...' : 'Pay with card'}
+              </Button>
+            )}
+
+            {/* Simulated checkout (dev/testing fallback) */}
+            {!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-olive animate-pulse" />
+                  <p className="font-mono text-xs text-muted-foreground uppercase tracking-[0.08em]">
+                    Demo mode — no real charges
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Payment is simulated. Click below to complete the order.
+                </p>
+                <Button
+                  onClick={handlePlaceOrder}
+                  disabled={isProcessing}
+                  className="w-full"
+                >
+                  {isProcessing ? 'Processing...' : 'Place order (simulated)'}
+                </Button>
+              </>
+            )}
+
+            <p className="mt-4 font-mono text-[10px] text-muted-foreground text-center tracking-wide">
+              {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                ? 'Secure checkout powered by Stripe. Your card details are never stored on our servers.'
+                : 'Test mode — no real payment processed.'}
+            </p>
           </div>
         </section>
       </div>
@@ -382,10 +491,16 @@ export function SimulatedCheckout() {
             {cart?.items?.map((item, i) => {
               if (typeof item.product !== 'object' || !item.product) return null
               const product = item.product as Product
-              const image =
+              // heroImage is the canonical thumbnail; fall back to gallery[0]
+              const resolvedHero =
+                product.heroImage && typeof product.heroImage !== 'string'
+                  ? product.heroImage
+                  : null
+              const galleryFallback =
                 product.gallery?.[0]?.image && typeof product.gallery[0].image !== 'string'
                   ? product.gallery[0].image
                   : null
+              const image = resolvedHero || galleryFallback
               const variant = item.variant
               let price = product.priceInUSD
               if (variant && typeof variant === 'object' && variant.priceInUSD) {
@@ -410,7 +525,7 @@ export function SimulatedCheckout() {
                     {variant && typeof variant === 'object' && (
                       <p className="text-xs text-muted-foreground font-mono capitalize">
                         {variant.options
-                          ?.map((o: any) => (typeof o === 'object' ? o.label : null))
+                          ?.map((o: string | VariantOption) => (typeof o === 'object' ? o.label : null))
                           .filter(Boolean)
                           .join(', ')}
                       </p>
